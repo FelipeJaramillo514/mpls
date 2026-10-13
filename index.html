@@ -3,29 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101c31">
+  <meta name="theme-color" content="#f4f7fb">
   <meta name="description" content="Presentación guiada sobre arquitectura, operación y aplicaciones de MPLS.">
   <title>MPLS: Arquitectura, Operación y Aplicaciones</title>
   <style>
     :root {
       color-scheme: light;
-      --ink: #17243b;
-      --muted: #52647a;
-      --paper: #f4f7fa;
-      --white: #fff;
-      --line: #dfe7ed;
-      --navy: #101c31;
+      --ink: #172b4d;
+      --muted: #53657d;
+      --paper: #f4f7fb;
+      --white: #ffffff;
+      --line: #d3deea;
+      --navy: #eaf0f7;
       --electric: #2563eb;
-      --cyan: #12b8c4;
-      --cyan-dark: #087f91;
-      --cyan-pale: #e8f8fa;
-      --blue-pale: #edf3ff;
+      --cyan: #0891b2;
+      --cyan-dark: #087e8b;
+      --cyan-pale: #e2f6f7;
+      --blue-pale: #eaf1ff;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     * { box-sizing: border-box; }
-    body { min-width: 320px; min-height: 100vh; margin: 0; overflow-x: clip; color: var(--ink); background: var(--paper); }
+    body { min-width: 320px; min-height: 100vh; margin: 0; overflow-x: clip; color: var(--ink); background: radial-gradient(ellipse at 78% 0%, #142846 0, transparent 44%), var(--paper); }
     button { font: inherit; }
-    .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 5; display: flex; width: 315px; flex-direction: column; padding: 22px 16px 16px; color: #eff5fb; background: var(--navy); }
+    .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 5; display: flex; width: 315px; flex-direction: column; padding: 22px 16px 16px; transform: translateX(-102%); color: #eff5fb; background: var(--navy); transition: transform .23s ease; }
+    .sidebar.is-open { transform: translateX(0); }
     .brand { display: flex; align-items: center; gap: 12px; padding: 0 10px 19px; border-bottom: 1px solid #ffffff1a; }
     .brand-mark { display: grid; width: 42px; height: 42px; place-items: center; border: 1px solid #4ed7d47a; border-radius: 12px; color: #69e2df; background: #27bfc01f; font-size: 12px; font-weight: 850; }
     .brand-title { font-size: 17px; font-weight: 750; }
@@ -42,10 +43,10 @@
     .sidebar-bottom { padding: 12px 10px 0; border-top: 1px solid #ffffff1a; }
     .sidebar-bottom p { margin: 0; color: #aab8c9; font-size: 14px; line-height: 1.6; }
     .sidebar-bottom strong { color: #fff; }
-    .main { min-height: 100vh; margin-left: 315px; }
-    .topbar { position: sticky; top: 0; z-index: 3; display: flex; min-height: 68px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 clamp(20px, 4vw, 58px); border-bottom: 1px solid #e0e7efdc; background: #f4f7faeF; backdrop-filter: blur(14px); }
+    .main { min-height: 100vh; margin-left: 0; }
+    .topbar { position: sticky; top: 0; z-index: 3; display: flex; min-height: 68px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 clamp(20px, 4vw, 58px); border-bottom: 1px solid #ffffff16; background: #0b1424eF; backdrop-filter: blur(14px); }
     .topbar-left, .topbar-right { display: flex; align-items: center; gap: 13px; }
-    .menu-toggle { display: none; }
+    .menu-toggle { display: inline-grid; width: 38px; height: 38px; flex: none; place-items: center; border: 1px solid #31445b; border-radius: 9px; color: #c8d8e8; background: #132239; cursor: pointer; }
     .eyebrow { color: var(--muted); font-size: 16px; font-weight: 750; }
     .counter { color: var(--muted); font-size: 17px; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .counter strong { color: var(--ink); }
@@ -64,7 +65,7 @@
     .lead { max-width: 1050px; margin-bottom: 28px; color: var(--muted); font-size: clamp(21px, 1.8vw, 25px); line-height: 1.55; }
     .accent { color: var(--cyan-dark); }
     .muted { color: var(--muted); }
-    .cover { position: relative; display: grid; min-height: 560px; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 24px; overflow: hidden; padding: clamp(27px, 4.5vw, 58px); border: 1px solid var(--line); border-top: 4px solid var(--electric); border-radius: 16px; background: #fff; }
+    .cover { position: relative; display: grid; min-height: 560px; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 24px; overflow: hidden; padding: clamp(27px, 4.5vw, 58px); border: 1px solid var(--line); border-top: 4px solid var(--electric); border-radius: 16px; background: linear-gradient(145deg, #13233a, #0e1b2e); }
     .cover .slide-kicker { margin-bottom: 20px; }
     .cover .lead { max-width: 600px; margin-bottom: 25px; }
     .cover-art { display: grid; min-height: 350px; place-items: center; }
@@ -73,93 +74,149 @@
     .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .card { padding: 21px; border: 1px solid var(--line); border-radius: 12px; background: var(--white); }
+    .card { padding: 21px; border: 1px solid var(--line); border-radius: 12px; background: linear-gradient(145deg, #14243a, #101d30); }
     .card h3 { margin-bottom: 11px; font-size: 23px; letter-spacing: -.015em; }
     .card p { margin-bottom: 0; color: var(--muted); font-size: 19px; line-height: 1.6; }
     .card-icon { display: grid; width: 40px; height: 40px; margin-bottom: 14px; place-items: center; border-radius: 11px; color: var(--cyan-dark); background: var(--cyan-pale); font-size: 13px; font-weight: 800; }
-    .callout { display: flex; align-items: flex-start; gap: 13px; margin-top: 19px; padding: 16px 19px; border: 1px solid #cce8ec; border-left: 3px solid var(--cyan); border-radius: 10px; color: #275760; background: #f2fafb; font-size: 19px; line-height: 1.55; }
-    .callout strong { color: #126e77; }
+    .callout { display: flex; align-items: flex-start; gap: 13px; margin-top: 19px; padding: 16px 19px; border: 1px solid #225263; border-left: 3px solid var(--cyan); border-radius: 10px; color: #c3d9e8; background: #102635; font-size: 19px; line-height: 1.55; }
+    .callout strong { color: #69e0e3; }
     .callout-mark { flex: none; color: var(--cyan-dark); font-weight: 900; }
     .speaker-cue { display: none; }
-    .compare { display: grid; gap: 6px; padding: 20px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
-    .compare.highlight { border-color: #c4e8e6; background: linear-gradient(145deg, #f2fbfa, #fff); }
+    .compare { display: grid; gap: 6px; padding: 20px; border: 1px solid var(--line); border-radius: 15px; background: #111e32; }
+    .compare.highlight { border-color: #276275; background: linear-gradient(145deg, #12313d, #111e32); }
     .compare h3 { margin: 0 0 5px; color: var(--cyan-dark); font-size: 21px; }
     .compare-row { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #edf0f3; font-size: 18px; }
     .compare-row:last-child { border-bottom: 0; }
     .compare-row span:first-child { color: var(--muted); }
     .compare-row strong { text-align: right; }
     .split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-    .quote { margin: 20px 0 0; padding: 19px 22px; border-left: 3px solid var(--cyan); border-radius: 0 12px 12px 0; color: #41546b; background: #fff; font-size: 22px; font-weight: 650; line-height: 1.55; }
+    .quote { margin: 20px 0 0; padding: 19px 22px; border-left: 3px solid var(--cyan); border-radius: 0 12px 12px 0; color: #d7e6f4; background: #132239; font-size: 22px; font-weight: 650; line-height: 1.55; }
     .bits { display: grid; grid-template-columns: 5fr 1fr 1fr 2fr; gap: 7px; margin: 18px 0; }
-    .bit { min-height: 84px; padding: 13px; border: 1px solid #dfe9ee; border-radius: 11px; background: #fff; }
-    .bit:first-child { border-color: #bce9e5; background: #effafa; }
+    .bit { min-height: 84px; padding: 13px; border: 1px solid var(--line); border-radius: 11px; background: #132239; }
+    .bit:first-child { border-color: #276275; background: #12313d; }
     .bit strong { display: block; margin-bottom: 6px; font-size: 18px; }
     .bit small { color: var(--muted); font-size: 16px; line-height: 1.45; }
-    .flow { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 19px 0; padding: 20px 12px; border: 1px solid var(--line); border-radius: 15px; background: linear-gradient(120deg, #fff, #f3fbfa); }
-    .flow-node { display: grid; min-width: 95px; min-height: 68px; place-items: center; padding: 9px; border: 1px solid #dfe8ed; border-radius: 11px; background: #fff; text-align: center; transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+    .flow { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 19px 0; padding: 20px 12px; border: 1px solid var(--line); border-radius: 15px; background: linear-gradient(120deg, #132239, #102432); }
+    .flow-node { display: grid; min-width: 95px; min-height: 68px; place-items: center; padding: 9px; border: 1px solid #2c4059; border-radius: 11px; background: #14243a; text-align: center; transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
     .flow-node strong { font-size: 17px; }
     .flow-node small { margin-top: 4px; color: var(--muted); font-size: 15px; line-height: 1.4; }
-    .flow-node.edge { border-color: #bce9e5; background: #effafa; }
+    .flow-node.edge { border-color: #276275; background: #12313d; }
     .flow-node.is-current { transform: translateY(-2px); border-color: var(--electric); box-shadow: 0 0 0 3px #2563eb20; }
     .flow-arrow { color: #398e91; font-size: 25px; }
-    .diagram-frame { margin: 18px 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+    .diagram-frame { margin: 18px 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: #f8fafc; }
     .diagram-frame svg { display: block; width: 100%; height: auto; font-family: inherit; }
     .network-art { font-family: inherit; }
-    .diagram-frame figcaption { padding: 12px 18px; border-top: 1px solid var(--line); color: var(--muted); background: #fff; font-size: 16px; line-height: 1.5; }
+    .diagram-frame figcaption { padding: 12px 18px; border-top: 1px solid var(--line); color: #d1deeb; background: #111e32; font-size: 16px; line-height: 1.5; }
     .stack { display: grid; max-width: 740px; gap: 8px; margin: 0 auto 17px; }
-    .stack-row { display: grid; grid-template-columns: 115px 1fr auto; align-items: center; gap: 12px; padding: 13px 16px; border: 1px solid #e2eaf0; border-radius: 10px; background: #fff; font-size: 18px; }
+    .stack-row { display: grid; grid-template-columns: 115px 1fr auto; align-items: center; gap: 12px; padding: 13px 16px; border: 1px solid var(--line); border-radius: 10px; background: #132239; font-size: 18px; }
     .stack-row strong { color: var(--cyan-dark); }
     .stack-row small { color: var(--muted); font-size: 16px; }
-    .stack-row.transport { border-color: #bce9e5; background: #effafa; }
+    .stack-row.transport { border-color: #276275; background: #12313d; }
     .three-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0 18px; }
-    .step { padding: 16px; border-radius: 12px; background: var(--blue-pale); }
+    .step { padding: 16px; border: 1px solid #293e5d; border-radius: 12px; background: var(--blue-pale); }
     .step:nth-child(2) { background: var(--cyan-pale); }
-    .step:nth-child(3) { background: #fff2e5; }
+    .step:nth-child(3) { border-color: #60452c; background: #302619; }
     .step b { display: block; margin-bottom: 6px; font-size: 18px; }
     .step span { color: var(--muted); font-size: 17px; line-height: 1.55; }
-    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: #111e32; }
     table { width: 100%; border-collapse: collapse; text-align: left; }
-    th, td { padding: 14px 15px; border-bottom: 1px solid #edf0f3; font-size: 17px; line-height: 1.45; }
-    th { color: var(--muted); background: #f8fafb; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; }
-    td { color: #34445a; }
+    th, td { padding: 14px 15px; border-bottom: 1px solid #283b53; font-size: 17px; line-height: 1.45; }
+    th { color: var(--muted); background: #17263d; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; }
+    td { color: #d5e1ef; }
     tr:last-child td { border-bottom: 0; }
     td strong { color: var(--ink); }
     .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; margin: 17px 0; }
-    .timeline-item { padding: 16px; border-top: 3px solid #bde9e5; border-radius: 0 0 12px 12px; background: #fff; }
+    .timeline-item { padding: 16px; border-top: 3px solid #25637c; border-radius: 0 0 12px 12px; background: #132239; }
     .timeline-item b { display: block; margin-bottom: 7px; color: var(--cyan-dark); font-size: 18px; }
     .timeline-item p { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.55; }
     .glossary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
-    .term { padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: white; }
+    .term { padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: #132239; }
     .term strong { display: block; margin-bottom: 5px; color: var(--cyan-dark); font-size: 17px; }
     .term span { color: var(--muted); font-size: 16px; line-height: 1.5; }
-    .interactive { margin: 16px 0; padding: 19px; border: 1px solid #cfe8e8; border-radius: 15px; background: #f8fdfd; }
+    .interactive { margin: 16px 0; padding: 19px; border: 1px solid #244957; border-radius: 15px; background: #10222f; }
     .interactive h3 { margin-bottom: 8px; font-size: 22px; }
     .interactive p { margin-bottom: 0; color: var(--muted); font-size: 19px; line-height: 1.6; }
     .choice-row { display: flex; flex-wrap: wrap; gap: 9px; margin: 13px 0; }
-    .choice { padding: 11px 15px; border: 1px solid #ccdcdf; border-radius: 9px; color: var(--ink); background: #fff; font-size: 17px; font-weight: 650; cursor: pointer; }
+    .choice { padding: 11px 15px; border: 1px solid #344b61; border-radius: 9px; color: var(--ink); background: #14243a; font-size: 17px; font-weight: 650; cursor: pointer; }
     .choice:hover, .choice[aria-pressed="true"] { border-color: var(--cyan); background: var(--cyan-pale); }
-    .walk-panel { min-height: 77px; padding: 13px 15px; border-radius: 10px; background: #fff; }
+    .walk-panel { min-height: 77px; padding: 13px 15px; border-radius: 10px; background: #14243a; }
     .walk-panel strong { display: block; margin-bottom: 5px; color: var(--cyan-dark); font-size: 18px; }
     .walk-panel span { color: var(--muted); font-size: 18px; line-height: 1.55; }
-    details { margin-top: 12px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 11px; background: white; }
+    details { margin-top: 12px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 11px; background: #132239; }
     summary { color: var(--cyan-dark); font-size: 18px; font-weight: 700; cursor: pointer; }
     details p { margin: 10px 0 0; color: var(--muted); font-size: 18px; line-height: 1.6; }
-    .slide-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 25px; padding-top: 16px; border-top: 1px solid var(--line); }
-    .keyboard-hint { color: #64758a; font-size: 15px; }
-    kbd { padding: 3px 7px; border: 1px solid #d9e0e7; border-radius: 5px; color: #586980; background: white; font: inherit; }
+    .slide-controls { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 25px; padding-top: 16px; border-top: 1px solid #ffffff18; }
+    .keyboard-hint { display: none; }
+    kbd { padding: 3px 7px; border: 1px solid #344b61; border-radius: 5px; color: #b4c2d4; background: #132239; font: inherit; }
     .control-group { display: flex; gap: 8px; }
-    .control { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 8px; padding: 0 18px; border: 1px solid #dce4eb; border-radius: 10px; color: #34445a; background: #fff; font-size: 17px; font-weight: 700; cursor: pointer; }
-    .control.primary { border-color: var(--electric); color: #fff; background: var(--electric); }
+    .control { position: relative; display: inline-grid; width: 42px; min-height: 42px; place-items: center; padding: 0; border: 1px solid #31445b; border-radius: 10px; color: #c8d8e8; background: #132239b8; cursor: pointer; }
+    .control.primary { border-color: #3673ed; color: #fff; background: #2563eb; }
     .control[aria-pressed="true"] { border-color: var(--cyan); color: #075e6d; background: var(--cyan-pale); }
     .control:disabled { opacity: .45; cursor: not-allowed; }
-    .speaker-guide { position: fixed; right: 32px; bottom: 88px; z-index: 6; width: min(780px, calc(100vw - 380px)); max-height: min(36vh, 340px); overflow-y: auto; padding: 20px 22px; border: 1px solid #ccdde7; border-left: 4px solid var(--electric); border-radius: 12px; background: #fff; box-shadow: 0 18px 45px #10243b26; }
+    .speaker-guide { position: fixed; right: 34px; bottom: 80px; z-index: 6; width: min(330px, calc(100vw - 32px)); max-height: min(250px, 40vh); overflow-y: auto; padding: 15px 17px; border: 1px solid #344b61; border-top: 2px solid var(--electric); border-radius: 12px; background: #111e32f5; box-shadow: 0 18px 45px #0008; backdrop-filter: blur(14px); }
     .speaker-guide[hidden] { display: none; }
-    .speaker-guide-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
-    .speaker-guide h2 { margin: 0; color: var(--ink); font-size: 21px; letter-spacing: -.02em; }
-    .guide-close { padding: 5px 9px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); background: #fff; font: inherit; font-size: 14px; cursor: pointer; }
-    .speaker-guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 22px; }
-    .speaker-guide-grid p { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.55; }
-    .speaker-guide-grid strong { display: block; margin-bottom: 4px; color: var(--electric); font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }
+    .speaker-guide-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 11px; }
+    .speaker-guide h2 { margin: 0; color: var(--ink); font-size: 17px; letter-spacing: -.02em; }
+    .guide-close { width: 30px; height: 30px; display: grid; place-items: center; padding: 0; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); background: #17263d; cursor: pointer; }
+    .speaker-guide-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .speaker-guide-grid p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.5; }
+    .speaker-guide-grid strong { display: block; margin-bottom: 3px; color: #65dce0; font-size: 11px; letter-spacing: .09em; text-transform: uppercase; }
+    .icon-button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-button:hover:not(:disabled), .guide-close:hover { border-color: #4f799a; color: #fff; background: #1b304b; }
+    .icon-button:focus-visible, .guide-close:focus-visible, .route-button:focus-visible { outline: 2px solid #67dfe4; outline-offset: 3px; }
+    .icon-button[aria-pressed="true"] { border-color: #1c8795; color: #74e4e6; background: #12313d; }
+    .route-figure { margin: 14px 0 12px; overflow: hidden; border: 1px solid #2c4059; border-radius: 14px; background: linear-gradient(145deg, #101e32, #0d192a); }
+    .route-svg { display: block; width: 100%; height: auto; }
+    .route-svg .site { fill: #13233a; stroke: #2d4561; stroke-width: 2; }
+    .route-svg .provider { fill: #0c2635; stroke: #1e5965; stroke-width: 2; }
+    .route-svg .link { fill: none; stroke: #42617c; stroke-width: 7; stroke-linecap: round; }
+    .route-svg .router-shell { fill: #192b42; stroke: #7891a9; stroke-width: 2; }
+    .route-svg .router-glyph { fill: none; stroke: #c8d9e8; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .route-svg .router-label { fill: #eff6ff; font: 700 17px Inter, system-ui, sans-serif; text-anchor: middle; }
+    .route-svg .router-role { fill: #a9bdd0; font: 13px Inter, system-ui, sans-serif; text-anchor: middle; }
+    .route-svg .zone-label { fill: #a9bdd0; font: 700 12px Inter, system-ui, sans-serif; letter-spacing: 1.1px; }
+    .route-svg .active-router .router-shell { fill: #17404b; stroke: #55d6dc; stroke-width: 3; filter: drop-shadow(0 0 9px #29c8d766); }
+    .route-svg .route-packet { filter: drop-shadow(0 3px 6px #050b12b8); }
+    .route-readout { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 18px; padding: 12px 16px; border-top: 1px solid #2c4059; }
+    .route-state { min-width: 0; flex: 1 1 300px; }
+    .route-state strong { display: block; margin-bottom: 4px; color: #72e2e5; font-size: 15px; }
+    .route-state span { color: #c5d4e3; font-size: 14px; line-height: 1.45; }
+    .label-stack { display: flex; align-items: center; gap: 7px; }
+    .label-chip { display: grid; min-width: 76px; gap: 2px; padding: 6px 9px; border: 1px solid #276275; border-radius: 8px; color: #bfeef0; background: #12313d; text-align: center; }
+    .label-chip small { color: #9bb3c6; font-size: 10px; letter-spacing: .04em; text-transform: uppercase; }
+    .label-chip strong { font-size: 14px; }
+    .label-chip.ip { border-color: #344b61; color: #dae7f4; background: #17263d; }
+    .route-controls { display: flex; justify-content: center; gap: 8px; margin: 10px 0 13px; }
+    .route-button { position: relative; display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid #31445b; border-radius: 10px; color: #d3e1ee; background: #132239; cursor: pointer; }
+    .route-button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .route-button[aria-pressed="true"] { border-color: #1c8795; color: #74e4e6; background: #12313d; }
+    .operation-demo { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px 18px; margin: 14px 0; padding: 14px 16px; border: 1px solid #2c4059; border-radius: 12px; background: #111e32; }
+    .operation-result strong { display: block; margin-bottom: 4px; color: #72e2e5; font-size: 16px; }
+    .operation-result span { color: #c5d4e3; font-size: 14px; line-height: 1.45; }
+    .operation-packet { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; grid-column: 1 / -1; }
+    .operation-token { padding: 6px 10px; border: 1px solid #276275; border-radius: 7px; color: #bfeef0; background: #12313d; font-size: 13px; font-weight: 700; animation: token-in .28s ease both; }
+    .operation-token.service { border-color: #485b83; color: #d1dfff; background: #1b2b48; }
+    .operation-token.payload { border-color: #344b61; color: #dae7f4; background: #17263d; }
+    .operation-controls { display: flex; gap: 6px; }
+    .operation-button { position: relative; display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid #31445b; border-radius: 9px; color: #d3e1ee; background: #132239; cursor: pointer; }
+    .operation-button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .operation-button:hover:not(:disabled) { border-color: #4f799a; color: #fff; }
+    .operation-button:disabled { opacity: .4; cursor: not-allowed; }
+    @keyframes token-in { from { opacity: .3; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+    .comparison-visual { margin: 18px 0 8px; overflow-x: auto; border: 1px solid #2c4059; border-radius: 14px; background: #101e32; }
+    .comparison-svg { display: block; width: 100%; height: auto; }
+    .comparison-svg .compare-heading { fill: #b8c9db; font: 750 15px Inter, system-ui, sans-serif; letter-spacing: .6px; }
+    .comparison-svg .mpls-heading { fill: #71dce0; }
+    .comparison-svg .compare-link { fill: none; stroke-width: 5; stroke-linecap: round; }
+    .comparison-svg .ip-link { stroke: #56769a; }
+    .comparison-svg .mpls-link { stroke: #25adb8; }
+    .comparison-svg .compare-router circle { fill: #192b42; stroke: #7891a9; stroke-width: 2; }
+    .comparison-svg .compare-router path { fill: none; stroke: #c8d9e8; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .comparison-svg .compare-router text { fill: #dce9f5; font: 700 14px Inter, system-ui, sans-serif; text-anchor: middle; }
+    .comparison-svg .compare-router.active circle { fill: #17404b; stroke: #55d6dc; stroke-width: 3; }
+    .comparison-svg .compare-packet circle { fill: #70a8ff; stroke: #ecf4ff; stroke-width: 2; filter: drop-shadow(0 2px 5px #050b12b8); }
+    .comparison-svg .compare-packet text { fill: #071629; font: 800 9px Inter, system-ui, sans-serif; text-anchor: middle; }
+    .comparison-svg .mpls-packet circle { fill: #37d5df; }
     .presentation-status { min-height: 1.4em; margin: 8px 0 0; color: #9f3434; font-size: 14px; }
     .app.is-presenting .sidebar, .app.is-presenting .topbar { display: none; }
     .app.is-presenting .main { margin-left: 0; }
@@ -167,21 +224,16 @@
     .app.is-presenting .slide { display: none; }
     .app.is-presenting .slide.is-active { display: grid; align-content: center; }
     .mobile-scrim { display: none; }
+    .mobile-scrim.is-open { position: fixed; inset: 0; z-index: 4; display: block; background: #030a13a8; }
     @media (max-width: 1080px) {
-      .sidebar { width: 285px; }
-      .main { margin-left: 285px; }
       .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .cover { grid-template-columns: 1fr .8fr; }
       .flow { flex-wrap: wrap; }
     }
     @media (max-width: 1024px) {
-      .sidebar { width: min(310px, 86vw); transform: translateX(-102%); transition: transform .23s ease; }
-      .sidebar.is-open { transform: translateX(0); }
-      .mobile-scrim.is-open { position: fixed; inset: 0; z-index: 4; display: block; background: #0a14246b; }
-      .main { margin-left: 0; }
+      .sidebar { width: min(310px, 86vw); }
       .topbar { min-height: 60px; padding: 0 16px; }
       .topbar-left { min-width: 0; gap: 9px; }
-      .menu-toggle { display: inline-grid; width: 37px; height: 37px; flex: none; place-items: center; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background: #fff; cursor: pointer; }
       .eyebrow { overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
       .progress-track { width: 66px; }
       .stage { min-height: calc(100vh - 60px); padding: 23px 17px 17px; }
@@ -196,13 +248,13 @@
       .card h3 { font-size: 21px; }
       .timeline { grid-template-columns: repeat(2, 1fr); }
       .glossary { grid-template-columns: repeat(2, 1fr); }
-      .speaker-guide-grid { grid-template-columns: 1fr; gap: 10px; }
       .speaker-guide { right: 16px; bottom: 82px; width: calc(100vw - 32px); max-height: 52vh; }
     }
     @media (max-width: 480px) {
       .grid-4 { grid-template-columns: 1fr; }
       .flow { flex-wrap: wrap; gap: 4px; padding: 13px 5px; }
       .diagram-frame svg { min-width: 720px; }
+      .comparison-svg { min-width: 760px; }
       .diagram-frame figcaption { font-size: 15px; }
       .flow-node { min-width: 60px; min-height: 57px; padding: 5px; }
       .flow-node strong { font-size: 13px; }
@@ -216,12 +268,13 @@
       .timeline { grid-template-columns: 1fr 1fr; }
       th, td { padding: 10px; }
       .compare-row { font-size: 16px; }
-      .control { min-height: 44px; padding: 0 12px; font-size: 15px; }
-      .slide-controls { align-items: flex-start; }
-      .control-group { width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); display: grid; gap: 7px; }
-      .control { width: 100%; padding: 0 8px; }
-      .speaker-guide { padding: 17px; }
-      .speaker-guide-grid p { font-size: 16px; }
+      .control { width: 42px; min-height: 42px; padding: 0; }
+      .slide-controls { align-items: center; }
+      .control-group { display: flex; width: auto; gap: 6px; }
+      .speaker-guide { padding: 14px; }
+      .operation-demo { grid-template-columns: 1fr; }
+      .operation-packet { grid-column: auto; }
+      .operation-controls { justify-content: flex-start; }
     }
     @media (max-width: 1024px) {
       .app.is-presenting .stage { padding: 24px 18px; }
@@ -229,11 +282,93 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
     }
+    body { background: radial-gradient(ellipse at 78% 0%, #e8f1fc 0, transparent 44%), var(--paper); }
+    .sidebar { color: var(--ink); background: #eaf0f7; }
+    .brand { border-bottom-color: var(--line); }
+    .brand-mark { border-color: #0891b27a; color: #087e8b; background: #0891b21a; }
+    .brand-subtitle, .nav-heading, .sidebar-bottom p { color: var(--muted); }
+    .topic { color: #40536b; }
+    .topic:hover { color: var(--ink); background: #dce6f1; }
+    .topic[aria-current="step"] { color: #123b78; background: #dce9ff; box-shadow: inset 2px 0 var(--cyan); }
+    .topic-number { color: #687c94; }
+    .topic[aria-current="step"] .topic-number, .topic-check { color: #087e8b; }
+    .sidebar-bottom { border-top-color: var(--line); }
+    .sidebar-bottom strong { color: var(--ink); }
+    .topbar { border-bottom-color: #d3deea; background: #f4f7fbed; }
+    .menu-toggle, .control, .route-button, .operation-button, .choice, .guide-close {
+      border-color: #c4d1e0;
+      color: #314761;
+      background: #ffffff;
+    }
+    .cover { background: linear-gradient(145deg, #ffffff, #edf4fc); }
+    .card { background: linear-gradient(145deg, #ffffff, #f8fafd); }
+    .callout { border-color: #b8dce4; color: #314b64; background: #eaf7fa; }
+    .callout strong, .callout-mark, .card-icon { color: #087e8b; }
+    .compare { background: #ffffff; }
+    .compare.highlight { border-color: #aad5dd; background: linear-gradient(145deg, #eaf7fa, #ffffff); }
+    .compare h3, .bit:first-child strong, .timeline-item b, .term strong, .summary,
+    .stack-row strong, .operation-result strong, .route-state strong { color: #087e8b; }
+    .compare-row { border-bottom-color: #e2e8f0; }
+    .quote { color: #29445f; background: #edf3fa; }
+    .bit, .flow-node, .stack-row, .term, details { background: #f1f5fa; }
+    .bit:first-child, .flow-node.edge, .stack-row.transport { border-color: #b8dce4; background: #e8f6f8; }
+    .flow { background: linear-gradient(120deg, #edf3fa, #f4f9fa); }
+    .flow-node { border-color: var(--line); }
+    .flow-arrow { color: #16808c; }
+    .diagram-frame figcaption { color: #344b64; background: #f1f5fa; }
+    .step:nth-child(3) { border-color: #e5d4b7; background: #fbf5e9; }
+    .table-wrap { background: #ffffff; }
+    th, td { border-bottom-color: #e2e8f0; }
+    th { background: #edf2f8; }
+    td { color: #344b64; }
+    .timeline-item { background: #f1f5fa; }
+    .interactive { border-color: #b8dce4; background: #eff8fa; }
+    .choice:hover, .choice[aria-pressed="true"] { background: #e2f6f7; }
+    .walk-panel, kbd { background: #f1f5fa; }
+    .slide-controls { border-top-color: #d3deea; }
+    kbd { border-color: #c4d1e0; color: #53657d; }
+    .control.primary { border-color: #2563eb; color: #ffffff; background: #2563eb; }
+    .control[aria-pressed="true"], .icon-button[aria-pressed="true"], .route-button[aria-pressed="true"] {
+      border-color: #0891b2;
+      color: #087e8b;
+      background: #e2f6f7;
+    }
+    .speaker-guide { border-color: #c4d1e0; background: #fffffffa; box-shadow: 0 18px 45px #29445f26; }
+    .speaker-guide-grid strong { color: #087e8b; }
+    .icon-button:hover:not(:disabled), .guide-close:hover, .operation-button:hover:not(:disabled) {
+      border-color: #8ba7c2;
+      color: #172b4d;
+      background: #edf3fa;
+    }
+    .icon-button:focus-visible, .guide-close:focus-visible, .route-button:focus-visible { outline-color: #0891b2; }
+    .route-figure, .operation-demo { border-color: #d3deea; background: #ffffff; }
+    .route-svg .site { fill: #eff4fa; stroke: #b8c8d9; }
+    .route-svg .provider { fill: #eaf7fa; stroke: #9bcbd4; }
+    .route-svg .link { stroke: #8ba2bb; }
+    .route-svg .router-shell { fill: #ffffff; stroke: #8197ae; }
+    .route-svg .router-glyph { stroke: #405872; }
+    .route-svg .router-label { fill: #172b4d; }
+    .route-svg .router-role, .route-svg .zone-label { fill: #53657d; }
+    .route-svg .active-router .router-shell { fill: #dff4f5; stroke: #0891b2; filter: drop-shadow(0 0 7px #0891b233); }
+    .route-readout { border-top-color: #d3deea; }
+    .route-state span, .operation-result span { color: #465d76; }
+    .label-chip, .operation-token { border-color: #9bcbd4; color: #155666; background: #e8f6f8; }
+    .label-chip small { color: #536d83; }
+    .label-chip.ip, .operation-token.payload { border-color: #c4d1e0; color: #405872; background: #edf2f8; }
+    .operation-token.service { border-color: #becbe1; color: #344b73; background: #edf1fa; }
+    .comparison-visual { border-color: #d3deea; background: #f8fafc; }
+    .comparison-svg .compare-heading { fill: #465d76; }
+    .comparison-svg .mpls-heading { fill: #087e8b; }
+    .comparison-svg .compare-router circle { fill: #ffffff; stroke: #8197ae; }
+    .comparison-svg .compare-router path { stroke: #405872; }
+    .comparison-svg .compare-router text { fill: #172b4d; }
+    .comparison-svg .compare-router.active circle { fill: #dff4f5; stroke: #0891b2; }
+    .mobile-scrim.is-open { background: #172b4d66; }
   </style>
 </head>
 <body>
   <div class="app">
-    <aside class="sidebar" id="sidebar" aria-label="Subtemas de la exposición">
+    <aside class="sidebar" id="sidebar" aria-label="Subtemas de la exposición" aria-hidden="true" inert>
       <div class="brand"><div class="brand-mark" aria-hidden="true">MPLS</div><div><div class="brand-title">Redes de operador</div><div class="brand-subtitle">Arquitectura · Operación · Aplicaciones</div></div></div>
       <p class="nav-heading">Subtemas de exposición</p>
       <nav class="topic-list" id="topic-list"></nav>
@@ -242,7 +377,7 @@
     <div class="mobile-scrim" id="mobile-scrim" aria-hidden="true"></div>
     <main class="main">
       <header class="topbar">
-        <div class="topbar-left"><button class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰</button><span class="eyebrow" id="section-name">MPLS</span></div>
+        <div class="topbar-left"><button class="menu-toggle icon-button" id="menu-toggle" type="button" aria-label="Abrir índice" aria-expanded="false" title="Abrir índice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><span class="eyebrow" id="section-name">MPLS</span></div>
         <div class="topbar-right"><div class="progress-track" role="progressbar" aria-label="Progreso de la presentación" aria-valuemin="1" aria-valuemax="20" aria-valuenow="1"><div class="progress-value" id="progress-value"></div></div><span class="counter"><strong id="current-number">01</strong> / <span id="total-number">20</span></span></div>
       </header>
       <div class="stage">
@@ -284,6 +419,32 @@
           <div class="split">
             <article class="compare"><h3>Reenvío IP</h3><div class="compare-row"><span>Consulta</span><strong>Dirección IP de destino</strong></div><div class="compare-row"><span>Siguiente salto</span><strong>Lo determina la tabla IP</strong></div><div class="compare-row"><span>Servicio</span><strong>Requiere políticas adicionales</strong></div><div class="compare-row"><span>Uso común</span><strong>Redes IP de todo tipo</strong></div></article>
             <article class="compare highlight"><h3>Reenvío MPLS</h3><div class="compare-row"><span>Consulta en el core</span><strong>Etiqueta superior</strong></div><div class="compare-row"><span>Siguiente salto</span><strong>Lo indica la LFIB</strong></div><div class="compare-row"><span>Servicio</span><strong>VPN, TE y clases de tráfico</strong></div><div class="compare-row"><span>Uso común</span><strong>Transporte de operador</strong></div></article>
+          </div>
+          <figure class="comparison-visual" aria-labelledby="comparison-caption">
+            <svg class="comparison-svg" viewBox="0 0 1100 250" role="img" aria-labelledby="comparison-title comparison-desc">
+              <title id="comparison-title">Comparación del reenvío IP y MPLS salto a salto</title>
+              <desc id="comparison-desc">Dos paquetes atraviesan routers. La ruta IP consulta la dirección de destino en la tabla IP; la ruta MPLS consulta la etiqueta superior mediante la LFIB.</desc>
+              <text class="compare-heading" x="30" y="34">REENVÍO IP · CONSULTA LA DIRECCIÓN DE DESTINO EN CADA SALTO</text>
+              <path class="compare-link ip-link" d="M190 91 H910"/>
+              <g class="compare-router" data-compare-row="ip" data-compare-node="0" transform="translate(190 91)"><circle r="23"/><path d="M-10 0h20m0 0-5-5m5 5-5 5M10-9v18m0 0 5-5m-5 5-5-5"/><text y="-34">R1</text></g>
+              <g class="compare-router" data-compare-row="ip" data-compare-node="1" transform="translate(430 91)"><circle r="23"/><path d="M-10 0h20m0 0-5-5m5 5-5 5M10-9v18m0 0 5-5m-5 5-5-5"/><text y="-34">R2</text></g>
+              <g class="compare-router" data-compare-row="ip" data-compare-node="2" transform="translate(670 91)"><circle r="23"/><path d="M-10 0h20m0 0-5-5m5 5-5 5M10-9v18m0 0 5-5m-5 5-5-5"/><text y="-34">R3</text></g>
+              <g class="compare-router" data-compare-row="ip" data-compare-node="3" transform="translate(910 91)"><circle r="23"/><path d="M-10 0h20m0 0-5-5m5 5-5 5M10-9v18m0 0 5-5m-5 5-5-5"/><text y="-34">R4</text></g>
+              <g id="ip-demo-packet" class="compare-packet" transform="translate(190 91)"><circle r="15"/><text y="4">IP</text></g>
+              <text class="compare-heading mpls-heading" x="30" y="158">REENVÍO MPLS · CONSULTA LA ETIQUETA SUPERIOR EN LA LFIB</text>
+              <path class="compare-link mpls-link" d="M190 211 H910"/>
+              <g class="compare-router" data-compare-row="mpls" data-compare-node="0" transform="translate(190 211)"><circle r="23"/><path d="M-10 0h20m0 0-5-5m5 5-5 5M10-9v18m0 0 5-5m-5 5-5-5"/><text y="-34">PE</text></g>
+              <g class="compare-router" data-compare-row="mpls" data-compare-node="1" transform="translate(430 211)"><circle r="23"/><path d="M-10 0h20m0 0-5-5m5 5-5 5M10-9v18m0 0 5-5m-5 5-5-5"/><text y="-34">P</text></g>
+              <g class="compare-router" data-compare-row="mpls" data-compare-node="2" transform="translate(670 211)"><circle r="23"/><path d="M-10 0h20m0 0-5-5m5 5-5 5M10-9v18m0 0 5-5m-5 5-5-5"/><text y="-34">P</text></g>
+              <g class="compare-router" data-compare-row="mpls" data-compare-node="3" transform="translate(910 211)"><circle r="23"/><path d="M-10 0h20m0 0-5-5m5 5-5 5M10-9v18m0 0 5-5m-5 5-5-5"/><text y="-34">PE</text></g>
+              <g id="mpls-demo-packet" class="compare-packet mpls-packet" transform="translate(190 211)"><circle r="15"/><text y="4">M</text></g>
+            </svg>
+            <figcaption id="comparison-caption">Los dos métodos avanzan salto a salto; cambia el dato que cada router consulta para decidir el siguiente salto.</figcaption>
+          </figure>
+          <div class="route-controls" role="group" aria-label="Animación comparativa de reenvío">
+            <button class="route-button" id="comparison-play" type="button" aria-label="Reproducir comparación" aria-pressed="false" title="Reproducir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></button>
+            <button class="route-button" id="comparison-pause" type="button" aria-label="Pausar comparación" aria-pressed="true" title="Pausar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button>
+            <button class="route-button" id="comparison-reset" type="button" aria-label="Reiniciar comparación" title="Reiniciar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"/><path d="M3 3v5h5"/></svg></button>
           </div>
           <div class="quote">La ventaja de MPLS no es que siempre sea más rápido: es que permite combinar transporte, caminos y servicios con una arquitectura común.</div>
           <aside class="speaker-cue"><strong>Explica qué cambia y qué no</strong><p>IP ya sabe enviar paquetes. MPLS no sustituye a IP ni garantiza por sí mismo más velocidad: añade etiquetas para que el proveedor organice el transporte y pueda ofrecer servicios como VPN.</p></aside>
@@ -342,6 +503,18 @@
             <figcaption>Las etiquetas se apilan delante del paquete. Cada router consulta la etiqueta superior; al quitarla, queda expuesta la siguiente.</figcaption>
           </figure>
           <div class="three-steps"><div class="step"><b>PUSH</b><span>Añade una etiqueta al ingresar al dominio o al asociar el servicio.</span></div><div class="step"><b>SWAP</b><span>Reemplaza la etiqueta por otra que el vecino anunció.</span></div><div class="step"><b>POP</b><span>Retira una etiqueta al aproximarse al destino o al salir del dominio.</span></div></div>
+          <div class="operation-demo">
+            <div class="operation-result" role="status" aria-live="polite"><strong id="operation-title">Pila de partida</strong><span id="operation-description">Prueba cómo cambian las etiquetas. Cada acción se aplica sobre la etiqueta que está arriba.</span></div>
+            <div class="operation-controls" role="group" aria-label="Operaciones sobre la pila MPLS">
+              <button class="operation-button" id="operation-push" type="button" aria-label="Aplicar PUSH" title="PUSH"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+              <button class="operation-button" id="operation-swap" type="button" aria-label="Aplicar SWAP" title="SWAP"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 3-3 3 3M10 4v7a4 4 0 0 0 4 4h3M17 17l-3 3-3-3m3 3v-7a4 4 0 0 0-4-4H7"/></svg></button>
+              <button class="operation-button" id="operation-pop" type="button" aria-label="Aplicar POP" title="POP"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14M12 4v8m-4-4 4 4 4-4M7 15v5h10v-5"/></svg></button>
+              <button class="operation-button" id="operation-reset" type="button" aria-label="Reiniciar pila" title="Reiniciar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"/><path d="M3 3v5h5"/></svg></button>
+            </div>
+            <div class="operation-packet" id="operation-packet" aria-label="Pila MPLS actual">
+              <span class="operation-token">Transporte 240</span><span class="operation-token service">Servicio 32</span><span class="operation-token payload">Paquete IP</span>
+            </div>
+          </div>
           <div class="callout"><span class="callout-mark">i</span><span><strong>Penultimate Hop Popping (PHP):</strong> el penúltimo router puede retirar la etiqueta exterior antes de llegar al PE de egreso. La etiqueta interior, si existe, se conserva.</span></div>
           <aside class="speaker-cue"><strong>Apóyate en la pila como un sobre</strong><p>La etiqueta exterior lleva el paquete por el transporte; la interior puede identificar el servicio al llegar. PUSH agrega, SWAP cambia la etiqueta de arriba y POP la retira. PHP permite que el penúltimo router quite la etiqueta exterior.</p></aside>
         </section>
@@ -355,9 +528,67 @@
         </section>
         <section class="slide" data-title="Recorrido de un paquete: sucursal → sede" aria-labelledby="slide-title-9">
           <p class="slide-kicker">09 · Paso a paso</p><h2 id="slide-title-9">Recorrido de un paquete: sucursal → sede</h2>
-          <p class="lead">Sigamos un paquete IP entre dos sucursales en una L3VPN. Pulsa cada equipo: verás la etiqueta exterior de transporte cambiar en el núcleo y la etiqueta interior de servicio identificar la VPN al llegar al PE remoto.</p>
-          <div class="flow"><div class="flow-node"><strong>1 · CE</strong><small>paquete IP</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>2 · PE ingreso</strong><small>PUSH transporte 240<br>+ servicio 32</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>3 · P1</strong><small>SWAP 240→77<br>conserva 32</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>4 · P2</strong><small>SWAP 77→24<br>conserva 32</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>5 · PE egreso</strong><small>usa servicio 32<br>entrega a la VRF</small></div></div>
-          <div class="interactive"><div class="choice-row"><button class="choice" data-info-target="packet-info" data-info-title="1 · El CE envía el paquete" data-info-text="El router del cliente envía un paquete IP normal. No necesita conocer las etiquetas MPLS del núcleo del proveedor." data-walk-nodes="0">CE</button><button class="choice" data-info-target="packet-info" data-info-title="2 · El PE de ingreso clasifica" data-info-text="El PE identifica la interfaz y la VRF del cliente. Añade la etiqueta de servicio y una etiqueta exterior de transporte que apunta al PE remoto." data-walk-nodes="1">PE de ingreso</button><button class="choice" data-info-target="packet-info" data-info-title="3–4 · Los routers P conmutan" data-info-text="Cada P consulta la etiqueta exterior en su LFIB y la cambia según el siguiente salto. La etiqueta de servicio interior se conserva; el P no necesita conocer la ruta privada del cliente." data-walk-nodes="2,3">Routers P</button><button class="choice" data-info-target="packet-info" data-info-title="5 · El PE de egreso entrega" data-info-text="El PE remoto recibe el paquete, identifica la etiqueta de servicio (o la recibe tras PHP), selecciona la VRF correcta y reenvía el paquete IP hacia el CE destino." data-walk-nodes="4">PE de egreso</button></div><div class="walk-panel" id="packet-info" aria-live="polite"><strong>Selecciona un punto del camino</strong><span>La etiqueta exterior guía el transporte; la interior conserva la identidad del servicio VPN.</span></div></div>
+          <p class="lead">Sigamos un paquete IP entre dos sucursales en una L3VPN. Observa cómo cambia la etiqueta exterior de transporte en el núcleo mientras la etiqueta interior identifica la VPN al llegar al PE remoto.</p>
+          <figure class="route-figure" aria-labelledby="route-caption">
+            <svg class="route-svg" viewBox="0 0 1100 320" role="img" aria-labelledby="mpls-route-title mpls-route-desc">
+              <title id="mpls-route-title">Paquete MPLS recorriendo una VPN entre dos sucursales</title>
+              <desc id="mpls-route-desc">Un paquete viaja desde el router CE de la sucursal A, entra al proveedor por un PE, atraviesa dos routers P, sale por otro PE y llega al CE de la sucursal B. Las etiquetas se actualizan paso a paso.</desc>
+              <rect class="site" x="16" y="42" width="174" height="226" rx="18"/>
+              <rect class="provider" x="205" y="42" width="690" height="226" rx="18"/>
+              <rect class="site" x="910" y="42" width="174" height="226" rx="18"/>
+              <text class="zone-label" x="34" y="68">SUCURSAL A</text>
+              <text class="zone-label" x="226" y="68">RED DEL PROVEEDOR · DOMINIO MPLS</text>
+              <text class="zone-label" x="928" y="68">SUCURSAL B</text>
+              <path class="link" d="M105 170 C160 170 210 170 280 170 S405 112 470 112 S575 170 640 170 S750 170 815 170 S930 170 990 170"/>
+              <g class="route-router" data-route-node="0" transform="translate(105 170)">
+                <rect class="router-shell" x="-37" y="-31" width="74" height="62" rx="17"/>
+                <path class="router-glyph" d="M-17 0h34m0 0-8-8m8 8-8 8M17-14v28m0 0 8-8m-8 8-8-8"/>
+                <text class="router-label" y="62">CE-A</text><text class="router-role" y="80">origen · IP</text>
+              </g>
+              <g class="route-router" data-route-node="1" transform="translate(280 170)">
+                <rect class="router-shell" x="-37" y="-31" width="74" height="62" rx="17"/>
+                <path class="router-glyph" d="M-17 0h34m0 0-8-8m8 8-8 8M17-14v28m0 0 8-8m-8 8-8-8"/>
+                <text class="router-label" y="62">PE-1</text><text class="router-role" y="80">ingreso · PUSH</text>
+              </g>
+              <g class="route-router" data-route-node="2" transform="translate(470 112)">
+                <rect class="router-shell" x="-37" y="-31" width="74" height="62" rx="17"/>
+                <path class="router-glyph" d="M-17 0h34m0 0-8-8m8 8-8 8M17-14v28m0 0 8-8m-8 8-8-8"/>
+                <text class="router-label" y="62">P1</text><text class="router-role" y="80">núcleo · SWAP</text>
+              </g>
+              <g class="route-router" data-route-node="3" transform="translate(640 170)">
+                <rect class="router-shell" x="-37" y="-31" width="74" height="62" rx="17"/>
+                <path class="router-glyph" d="M-17 0h34m0 0-8-8m8 8-8 8M17-14v28m0 0 8-8m-8 8-8-8"/>
+                <text class="router-label" y="62">P2</text><text class="router-role" y="80">núcleo · SWAP</text>
+              </g>
+              <g class="route-router" data-route-node="4" transform="translate(815 170)">
+                <rect class="router-shell" x="-37" y="-31" width="74" height="62" rx="17"/>
+                <path class="router-glyph" d="M-17 0h34m0 0-8-8m8 8-8 8M17-14v28m0 0 8-8m-8 8-8-8"/>
+                <text class="router-label" y="62">PE-2</text><text class="router-role" y="80">egreso · POP</text>
+              </g>
+              <g class="route-router" data-route-node="5" transform="translate(990 170)">
+                <rect class="router-shell" x="-37" y="-31" width="74" height="62" rx="17"/>
+                <path class="router-glyph" d="M-17 0h34m0 0-8-8m8 8-8 8M17-14v28m0 0 8-8m-8 8-8-8"/>
+                <text class="router-label" y="62">CE-B</text><text class="router-role" y="80">destino · IP</text>
+              </g>
+              <g class="route-packet" id="route-packet" transform="translate(105 170)">
+                <rect x="-22" y="-16" width="44" height="32" rx="9" fill="#37d5df" stroke="#e0fcff" stroke-width="2"/>
+                <path d="M-9-4h18M-9 4h12" stroke="#083649" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="13" cy="4" r="2" fill="#083649"/>
+              </g>
+              <text x="550" y="292" fill="#91a9bd" font-size="13" text-anchor="middle">Selecciona reproducir o avanza paso a paso para seguir las etiquetas.</text>
+            </svg>
+            <figcaption id="route-caption">Cada equipo actúa sobre el paquete al recibirlo: el PE añade etiquetas, los P conmutan la etiqueta exterior y el PE remoto entrega el servicio.</figcaption>
+            <div class="route-readout">
+              <div class="route-state" aria-live="polite" aria-atomic="true"><strong id="route-step-title">1 · CE-A envía el paquete</strong><span id="route-step-description">Sale un paquete IP normal; el router del cliente no necesita conocer MPLS.</span></div>
+              <div class="label-stack" id="route-label-stack" aria-label="Etiquetas actuales del paquete"><span class="label-chip ip"><small>Contenido</small><strong>Paquete IP</strong></span></div>
+            </div>
+          </figure>
+          <div class="route-controls" role="group" aria-label="Controles del recorrido MPLS">
+            <button class="route-button" id="route-play" type="button" aria-label="Reproducir recorrido" aria-pressed="false" title="Reproducir recorrido"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></button>
+            <button class="route-button" id="route-pause" type="button" aria-label="Pausar recorrido" aria-pressed="true" title="Pausar recorrido"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button>
+            <button class="route-button" id="route-next" type="button" aria-label="Avanzar un paso" title="Siguiente paso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14l11-7zM19 5v14"/></svg></button>
+            <button class="route-button" id="route-reset" type="button" aria-label="Reiniciar recorrido" title="Reiniciar recorrido"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"/><path d="M3 3v5h5"/></svg></button>
+          </div>
           <div class="callout"><span class="callout-mark">↗</span><span><strong>Nota:</strong> el dibujo muestra el caso conceptual de dos etiquetas. Con PHP, el penúltimo router puede retirar la exterior antes del PE de egreso; la etiqueta de servicio se conserva.</span></div>
           <aside class="speaker-cue"><strong>Cuenta el viaje en dos capas</strong><p>El PE pone dos etiquetas: la de afuera guía el viaje y la de adentro identifica la VPN. Los P solo cambian la de afuera. Al llegar al PE remoto, se usa la de servicio para entregar el paquete al cliente correcto.</p></aside>
         </section>
@@ -620,14 +851,17 @@
           <div class="callout"><span class="callout-mark">?</span><span><strong>Preguntas y discusión:</strong> ¿qué ventaja de MPLS sería más importante para el caso de red que estás diseñando?</span></div>
           <aside class="speaker-cue"><strong>Cierra volviendo a la pregunta inicial</strong><p>MPLS permite transportar y separar servicios en una red compartida usando etiquetas. La idea más importante es distinguir el transporte, el servicio y las políticas de operación; ahora podemos explicar cada parte siguiendo el recorrido de un paquete.</p></aside>
         </section>
-        <footer class="slide-controls"><span class="keyboard-hint">Avanza con <kbd>←</kbd> <kbd>→</kbd>, selecciona un título o usa Inicio / Fin.</span><div class="control-group"><button class="control" id="guide-toggle" type="button" aria-controls="speaker-guide" aria-expanded="false">Guía del expositor</button><button class="control" id="presentation-toggle" type="button" aria-pressed="false">Pantalla completa</button><button class="control" id="previous" type="button">← <span>Anterior</span></button><button class="control primary" id="next" type="button"><span>Siguiente</span> →</button></div></footer>
+        <footer class="slide-controls"><div class="control-group">
+          <button class="control icon-button" id="guide-toggle" type="button" aria-label="Abrir guía del expositor" aria-controls="speaker-guide" aria-expanded="false" aria-pressed="false" title="Guía del expositor"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.3 2.3 0 1 1 3.9 1.6c-1.1 1-1.7 1.3-1.7 2.9M12 17h.01"/></svg></button>
+          <button class="control icon-button" id="presentation-toggle" type="button" aria-label="Activar pantalla completa" aria-pressed="false" title="Pantalla completa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/></svg></button>
+          <button class="control icon-button" id="previous" type="button" aria-label="Diapositiva anterior" title="Anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+          <button class="control icon-button primary" id="next" type="button" aria-label="Diapositiva siguiente" title="Siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div></footer>
         <aside class="speaker-guide" id="speaker-guide" aria-labelledby="guide-title" aria-live="polite" hidden>
-          <div class="speaker-guide-heading"><h2 id="guide-title">Guía del expositor</h2><button class="guide-close" id="guide-close" type="button">Cerrar</button></div>
+          <div class="speaker-guide-heading"><h2 id="guide-title">Guía del expositor</h2><button class="guide-close icon-button" id="guide-close" type="button" aria-label="Cerrar guía" title="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
           <div class="speaker-guide-grid">
             <p><strong>Explícalo así</strong><span id="guide-explanation"></span></p>
-            <p><strong>Recuerda mencionar</strong><span id="guide-key-point"></span></p>
-            <p><strong>Señala</strong><span id="guide-visual"></span></p>
-            <p><strong>Transición</strong><span id="guide-transition"></span></p>
+            <p><strong>Palabras clave</strong><span id="guide-keywords"></span></p>
           </div>
         </aside>
         <p class="presentation-status" id="presentation-status" role="status" aria-live="polite"></p>
@@ -648,16 +882,107 @@
       const guideClose = document.getElementById("guide-close");
       const speakerGuide = document.getElementById("speaker-guide");
       const guideExplanation = document.getElementById("guide-explanation");
-      const guideKeyPoint = document.getElementById("guide-key-point");
-      const guideVisual = document.getElementById("guide-visual");
-      const guideTransition = document.getElementById("guide-transition");
       const presentationToggle = document.getElementById("presentation-toggle");
       const presentationStatus = document.getElementById("presentation-status");
       const app = document.querySelector(".app");
       const sidebar = document.getElementById("sidebar");
       const menuToggle = document.getElementById("menu-toggle");
       const mobileScrim = document.getElementById("mobile-scrim");
+      const guideKeywords = document.getElementById("guide-keywords");
+      const routePath = document.querySelector(".route-svg .link");
+      const routePacket = document.getElementById("route-packet");
+      const routeNodes = [...document.querySelectorAll("[data-route-node]")];
+      const routeStepTitle = document.getElementById("route-step-title");
+      const routeStepDescription = document.getElementById("route-step-description");
+      const routeLabelStack = document.getElementById("route-label-stack");
+      const routePlay = document.getElementById("route-play");
+      const routePause = document.getElementById("route-pause");
+      const routeNext = document.getElementById("route-next");
+      const routeReset = document.getElementById("route-reset");
+      const operationPacket = document.getElementById("operation-packet");
+      const operationTitle = document.getElementById("operation-title");
+      const operationDescription = document.getElementById("operation-description");
+      const operationPush = document.getElementById("operation-push");
+      const operationSwap = document.getElementById("operation-swap");
+      const operationPop = document.getElementById("operation-pop");
+      const operationReset = document.getElementById("operation-reset");
+      const comparisonIpPath = document.querySelector(".ip-link");
+      const comparisonMplsPath = document.querySelector(".mpls-link");
+      const comparisonIpPacket = document.getElementById("ip-demo-packet");
+      const comparisonMplsPacket = document.getElementById("mpls-demo-packet");
+      const comparisonNodes = [...document.querySelectorAll(".comparison-svg .compare-router")];
+      const comparisonPlay = document.getElementById("comparison-play");
+      const comparisonPause = document.getElementById("comparison-pause");
+      const comparisonReset = document.getElementById("comparison-reset");
+      const routeSteps = [
+        {
+          title: "1 · CE-A envía el paquete",
+          description: "Sale un paquete IP normal; el router del cliente no necesita conocer MPLS.",
+          labels: '<span class="label-chip ip"><small>Contenido</small><strong>Paquete IP</strong></span>'
+        },
+        {
+          title: "2 · PE-1 clasifica y añade etiquetas",
+          description: "Identifica interfaz y VRF. PUSH añade transporte 240 arriba y servicio 32 debajo, que identifica la VPN remota.",
+          labels: '<span class="label-chip"><small>Transporte · cima</small><strong>240</strong></span><span class="label-chip"><small>Servicio</small><strong>32</strong></span>'
+        },
+        {
+          title: "3 · P1 conmuta la etiqueta exterior",
+          description: "Consulta 240 en su LFIB y hace SWAP a 77. La etiqueta interior 32 se conserva; P1 no conoce las rutas privadas.",
+          labels: '<span class="label-chip"><small>Transporte · cima</small><strong>77</strong></span><span class="label-chip"><small>Servicio</small><strong>32</strong></span>'
+        },
+        {
+          title: "4 · P2 conmuta hacia PE-2",
+          description: "Hace SWAP de 77 a 24 y mantiene 32. En esta secuencia, la etiqueta exterior llega hasta PE-2.",
+          labels: '<span class="label-chip"><small>Transporte · cima</small><strong>24</strong></span><span class="label-chip"><small>Servicio</small><strong>32</strong></span>'
+        },
+        {
+          title: "5 · PE-2 selecciona la VRF",
+          description: "La etiqueta de servicio 32 identifica la VRF de destino. El PE retira la pila MPLS y entrega el paquete IP.",
+          labels: '<span class="label-chip"><small>Servicio · VRF</small><strong>32</strong></span>'
+        },
+        {
+          title: "6 · CE-B recibe el paquete IP",
+          description: "El tráfico vuelve a la red del cliente. La VRF mantiene la separación del servicio en la red del proveedor.",
+          labels: '<span class="label-chip ip"><small>Contenido</small><strong>Paquete IP</strong></span>'
+        }
+      ];
       let activeIndex = 0;
+      let routeIndex = 0;
+      let routeTimer = null;
+      let routeFrame = 0;
+      let routeLengths = [];
+      let comparisonProgress = 0;
+      let comparisonFrame = 0;
+      let comparisonStartTime = 0;
+      let comparisonStartProgress = 0;
+      const comparisonIpLength = comparisonIpPath.getTotalLength();
+      const comparisonMplsLength = comparisonMplsPath.getTotalLength();
+      const startingLabels = [
+        { value: 240, kind: "transport" },
+        { value: 32, kind: "service" }
+      ];
+      let operationLabels = startingLabels.map(label => ({ ...label }));
+      let nextPushedLabel = 160;
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      if (routePath) {
+        const totalLength = routePath.getTotalLength();
+        routeLengths = routeNodes.map(node => {
+          const matrix = node.transform.baseVal.consolidate()?.matrix;
+          if (!matrix) throw new Error("No se pudo ubicar un router en la topología MPLS.");
+          let closestLength = 0;
+          let closestDistance = Number.POSITIVE_INFINITY;
+          for (let sample = 0; sample <= 500; sample += 1) {
+            const length = totalLength * sample / 500;
+            const point = routePath.getPointAtLength(length);
+            const distance = (point.x - matrix.e) ** 2 + (point.y - matrix.f) ** 2;
+            if (distance < closestDistance) {
+              closestDistance = distance;
+              closestLength = length;
+            }
+          }
+          return closestLength;
+        });
+      }
       document.getElementById("total-number").textContent = String(slides.length).padStart(2, "0");
       progressBar.setAttribute("aria-valuemax", String(slides.length));
       slides.forEach((slide, index) => {
@@ -670,53 +995,145 @@
         topicList.append(button);
       });
       const topicButtons = [...topicList.querySelectorAll(".topic")];
-      function getVisualPrompt(slide) {
-        const options = [
-          [".diagram-frame", "Diagrama"],
-          [".cover-art", "Topología"],
-          [".flow", "Recorrido"],
-          [".stack", "Pila"],
-          [".bits", "Campos"],
-          [".three-steps", "Secuencia"],
-          [".table-wrap", "Tabla"],
-          [".timeline", "Línea de tiempo"],
-          [".interactive", "Interacción"],
-          [".split", "Comparación"],
-          [".grid", "Conceptos"]
-        ];
-        for (const [selector, label] of options) {
-          const visual = slide.querySelector(selector);
-          if (!visual) continue;
-          const caption = visual.querySelector("figcaption");
-          if (caption) return `${label}: ${caption.textContent.trim()}`;
-          const labels = [...visual.querySelectorAll(".flow-node strong, .stack-row strong, .bit strong, .step b, .timeline-item b, .card h3, .compare h3, th")]
-            .map(item => item.textContent.trim())
-            .filter(Boolean)
-            .slice(0, 4);
-          if (labels.length) return `${label}: ${labels.join(" → ")}`;
-        }
-        return slide.querySelector(".lead")?.textContent.trim() || slide.dataset.title;
-      }
       function updateSpeakerGuide() {
         const slide = slides[activeIndex];
         const cue = slide.querySelector(".speaker-cue");
-        guideExplanation.textContent = cue?.querySelector("p")?.textContent.trim()
+        const explanation = cue?.querySelector("p")?.textContent.trim()
           || slide.querySelector(".lead")?.textContent.trim()
           || slide.dataset.title;
-        guideKeyPoint.textContent = cue?.querySelector("strong")?.textContent.trim()
-          || slide.dataset.title;
-        guideVisual.textContent = getVisualPrompt(slide);
-        const nextTitle = slides[activeIndex + 1]?.dataset.title;
-        guideTransition.textContent = nextTitle
-          ? `Al terminar, enlaza con «${nextTitle}».`
-          : "Cierra conectando las ideas principales de la exposición.";
+        const firstThought = explanation.match(/^.*?[.!?](?:\s|$)/)?.[0] || explanation;
+        guideExplanation.textContent = firstThought.length > 210
+          ? `${firstThought.slice(0, 207).trimEnd()}…`
+          : firstThought;
+        const stopWords = new Set(["de", "del", "la", "el", "los", "las", "y", "en", "con", "por", "para", "que", "una", "un"]);
+        guideKeywords.textContent = slide.dataset.title
+          .replace(/[·:→]/g, " ")
+          .split(/\s+/)
+          .filter(word => word.length > 2 && !stopWords.has(word.toLowerCase()))
+          .slice(0, 3)
+          .join(" · ");
       }
+      function updateRouteLabels(step) {
+        const point = routePath.getPointAtLength(routeLengths[step]);
+        routePacket.setAttribute("transform", `translate(${point.x} ${point.y})`);
+        routeNodes.forEach((node, index) => {
+          node.classList.toggle("active-router", index === step);
+        });
+        routeStepTitle.textContent = routeSteps[step].title;
+        routeStepDescription.textContent = routeSteps[step].description;
+        routeLabelStack.innerHTML = routeSteps[step].labels;
+        routeLabelStack.setAttribute("aria-label", routeStepDescription.textContent);
+        routeNext.disabled = step === routeSteps.length - 1;
+      }
+      function renderOperationStack() {
+        operationPacket.innerHTML = [
+          ...operationLabels.map(label => `<span class="operation-token${label.kind === "service" ? " service" : ""}">${label.kind === "service" ? "Servicio" : "Transporte"} ${label.value}</span>`),
+          '<span class="operation-token payload">Paquete IP</span>'
+        ].join("");
+        operationPacket.setAttribute("aria-label", `Pila actual: ${operationLabels.map(label => `${label.kind === "service" ? "servicio" : "transporte"} ${label.value}`).join(", ") || "sin etiquetas"}; paquete IP`);
+        operationSwap.disabled = operationLabels.length === 0;
+        operationPop.disabled = operationLabels.length === 0;
+      }
+      function updateComparison(progress) {
+        comparisonProgress = Math.max(0, Math.min(progress, 1));
+        const ipPoint = comparisonIpPath.getPointAtLength(comparisonIpLength * comparisonProgress);
+        const mplsPoint = comparisonMplsPath.getPointAtLength(comparisonMplsLength * comparisonProgress);
+        comparisonIpPacket.setAttribute("transform", `translate(${ipPoint.x} ${ipPoint.y})`);
+        comparisonMplsPacket.setAttribute("transform", `translate(${mplsPoint.x} ${mplsPoint.y})`);
+        const activeNode = Math.min(3, Math.floor(comparisonProgress * 4));
+        comparisonNodes.forEach(node => {
+          node.classList.toggle("active", Number(node.dataset.compareNode) === activeNode);
+        });
+      }
+      function setComparisonPlaying(playing) {
+        if (!playing) window.cancelAnimationFrame(comparisonFrame);
+        comparisonPlay.setAttribute("aria-pressed", String(playing));
+        comparisonPause.setAttribute("aria-pressed", String(!playing));
+        if (!playing) return;
+        if (comparisonProgress >= 1) updateComparison(0);
+        if (reducedMotion.matches) {
+          updateComparison(1);
+          comparisonPlay.setAttribute("aria-pressed", "false");
+          comparisonPause.setAttribute("aria-pressed", "true");
+          return;
+        }
+        comparisonStartProgress = comparisonProgress;
+        comparisonStartTime = 0;
+        const animate = timestamp => {
+          if (!comparisonStartTime) comparisonStartTime = timestamp;
+          const elapsed = timestamp - comparisonStartTime;
+          const progress = comparisonStartProgress + elapsed / 3200;
+          updateComparison(progress);
+          if (progress < 1) {
+            comparisonFrame = window.requestAnimationFrame(animate);
+          } else {
+            comparisonPlay.setAttribute("aria-pressed", "false");
+            comparisonPause.setAttribute("aria-pressed", "true");
+          }
+        };
+        comparisonFrame = window.requestAnimationFrame(animate);
+      }
+      function moveRoutePacket(from, to) {
+        window.cancelAnimationFrame(routeFrame);
+        const startLength = routeLengths[from];
+        const endLength = routeLengths[to];
+        const duration = reducedMotion.matches ? 0 : 650;
+        if (!duration) {
+          const point = routePath.getPointAtLength(endLength);
+          routePacket.setAttribute("transform", `translate(${point.x} ${point.y})`);
+          return;
+        }
+        let startedAt = 0;
+        const move = timestamp => {
+          if (!startedAt) startedAt = timestamp;
+          const progress = Math.min((timestamp - startedAt) / duration, 1);
+          const eased = progress * progress * (3 - 2 * progress);
+          const point = routePath.getPointAtLength(startLength + (endLength - startLength) * eased);
+          routePacket.setAttribute("transform", `translate(${point.x} ${point.y})`);
+          if (progress < 1) routeFrame = window.requestAnimationFrame(move);
+        };
+        routeFrame = window.requestAnimationFrame(move);
+      }
+      function setRouteStep(step) {
+        const nextStep = Math.max(0, Math.min(step, routeSteps.length - 1));
+        const previousStep = routeIndex;
+        routeIndex = nextStep;
+        updateRouteLabels(nextStep);
+        moveRoutePacket(previousStep, nextStep);
+      }
+      function setRoutePlaying(playing) {
+        window.clearInterval(routeTimer);
+        routeTimer = null;
+        if (!playing) {
+          window.cancelAnimationFrame(routeFrame);
+          updateRouteLabels(routeIndex);
+          renderOperationStack();
+          updateComparison(0);
+        }
+        routePlay.setAttribute("aria-pressed", String(playing));
+        routePause.setAttribute("aria-pressed", String(!playing));
+        if (playing) {
+          if (routeIndex === routeSteps.length - 1) setRouteStep(0);
+          routeTimer = window.setInterval(() => {
+            if (routeIndex >= routeSteps.length - 1) {
+              setRoutePlaying(false);
+              return;
+            }
+            setRouteStep(routeIndex + 1);
+            if (routeIndex === routeSteps.length - 1) setRoutePlaying(false);
+          }, reducedMotion.matches ? 1800 : 1450);
+        }
+      }
+      updateRouteLabels(routeIndex);
       function showSlide(index) {
         activeIndex = Math.max(0, Math.min(index, slides.length - 1));
+        setRoutePlaying(false);
+        setComparisonPlaying(false);
         window.scrollTo(0, 0);
         speakerGuide.hidden = true;
         guideToggle.setAttribute("aria-expanded", "false");
         guideToggle.setAttribute("aria-pressed", "false");
+        guideToggle.setAttribute("aria-label", "Abrir guía del expositor");
         slides.forEach((slide, i) => {
           const active = i === activeIndex;
           slide.classList.toggle("is-active", active);
@@ -738,9 +1155,12 @@
       }
       function closeMenu() {
         sidebar.classList.remove("is-open");
+        sidebar.inert = true;
+        sidebar.setAttribute("aria-hidden", "true");
         mobileScrim.classList.remove("is-open");
         menuToggle.setAttribute("aria-expanded", "false");
-        menuToggle.setAttribute("aria-label", "Abrir menú");
+        menuToggle.setAttribute("aria-label", "Abrir índice");
+        menuToggle.title = "Abrir índice";
       }
       document.addEventListener("click", event => {
         const button = event.target.closest("[data-info-target]");
@@ -760,12 +1180,60 @@
       });
       previous.addEventListener("click", () => showSlide(activeIndex - 1));
       next.addEventListener("click", () => showSlide(activeIndex + 1));
+      routePlay.addEventListener("click", () => setRoutePlaying(true));
+      routePause.addEventListener("click", () => setRoutePlaying(false));
+      routeNext.addEventListener("click", () => {
+        setRoutePlaying(false);
+        setRouteStep(routeIndex + 1);
+      });
+      routeReset.addEventListener("click", () => {
+        setRoutePlaying(false);
+        setRouteStep(0);
+      });
+      comparisonPlay.addEventListener("click", () => setComparisonPlaying(true));
+      comparisonPause.addEventListener("click", () => setComparisonPlaying(false));
+      comparisonReset.addEventListener("click", () => {
+        setComparisonPlaying(false);
+        updateComparison(0);
+      });
+      operationPush.addEventListener("click", () => {
+        operationLabels.unshift({ value: nextPushedLabel, kind: "transport" });
+        operationTitle.textContent = "PUSH · se añade una etiqueta";
+        operationDescription.textContent = `La etiqueta de transporte ${nextPushedLabel} queda arriba de la pila existente.`;
+        nextPushedLabel = nextPushedLabel >= 999 ? 160 : nextPushedLabel + 37;
+        renderOperationStack();
+      });
+      operationSwap.addEventListener("click", () => {
+        if (!operationLabels.length) return;
+        const previousLabel = operationLabels[0].value;
+        operationLabels[0].value = 77;
+        operationTitle.textContent = "SWAP · cambia la etiqueta superior";
+        operationDescription.textContent = `La etiqueta superior ${previousLabel} se reemplaza por 77; las que están debajo se conservan.`;
+        renderOperationStack();
+      });
+      operationPop.addEventListener("click", () => {
+        if (!operationLabels.length) return;
+        const removedLabel = operationLabels.shift();
+        operationTitle.textContent = "POP · se retira la etiqueta superior";
+        operationDescription.textContent = `${removedLabel.kind === "service" ? "La etiqueta de servicio" : "La etiqueta de transporte"} ${removedLabel.value} sale de la pila y deja visible la siguiente capa.`;
+        renderOperationStack();
+      });
+      operationReset.addEventListener("click", () => {
+        operationLabels = startingLabels.map(label => ({ ...label }));
+        nextPushedLabel = 160;
+        operationTitle.textContent = "Pila de partida";
+        operationDescription.textContent = "Prueba cómo cambian las etiquetas. Cada acción se aplica sobre la etiqueta que está arriba.";
+        renderOperationStack();
+      });
       menuToggle.addEventListener("click", () => {
         const open = !sidebar.classList.contains("is-open");
         sidebar.classList.toggle("is-open", open);
+        sidebar.inert = !open;
+        sidebar.setAttribute("aria-hidden", String(!open));
         mobileScrim.classList.toggle("is-open", open);
         menuToggle.setAttribute("aria-expanded", String(open));
-        menuToggle.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
+        menuToggle.setAttribute("aria-label", open ? "Cerrar índice" : "Abrir índice");
+        menuToggle.title = open ? "Cerrar índice" : "Abrir índice";
       });
       mobileScrim.addEventListener("click", closeMenu);
       guideToggle.addEventListener("click", () => {
@@ -773,18 +1241,25 @@
         speakerGuide.hidden = !open;
         guideToggle.setAttribute("aria-expanded", String(open));
         guideToggle.setAttribute("aria-pressed", String(open));
+        guideToggle.setAttribute("aria-label", open ? "Cerrar guía del expositor" : "Abrir guía del expositor");
+        if (open) guideClose.focus();
       });
       guideClose.addEventListener("click", () => {
         speakerGuide.hidden = true;
         guideToggle.setAttribute("aria-expanded", "false");
         guideToggle.setAttribute("aria-pressed", "false");
+        guideToggle.setAttribute("aria-label", "Abrir guía del expositor");
         guideToggle.focus();
       });
       document.addEventListener("fullscreenchange", () => {
         const presenting = Boolean(document.fullscreenElement);
         app.classList.toggle("is-presenting", presenting);
         presentationToggle.setAttribute("aria-pressed", String(presenting));
-        presentationToggle.textContent = presenting ? "Salir de presentación" : "Pantalla completa";
+        presentationToggle.setAttribute("aria-label", presenting ? "Salir de pantalla completa" : "Activar pantalla completa");
+        presentationToggle.title = presenting ? "Salir de pantalla completa" : "Pantalla completa";
+        presentationToggle.querySelector("svg").innerHTML = presenting
+          ? '<path d="M8 3v5H3m13-5v5h5M3 16h5v5m8-5h5v5"/>'
+          : '<path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M3 16v3a2 2 0 0 0 2 2h3m13-5v3a2 2 0 0 1-2 2h-3"/>';
         if (presenting) presentationStatus.textContent = "";
       });
       function reportPresentationError(error) {
