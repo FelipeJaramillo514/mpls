@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101c31">
+  <meta name="description" content="Presentación guiada sobre arquitectura, operación y aplicaciones de MPLS.">
+  <title>MPLS: Arquitectura, Operación y Aplicaciones</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17243b;
+      --muted: #52647a;
+      --paper: #f4f7fa;
+      --white: #fff;
+      --line: #dfe7ed;
+      --navy: #101c31;
+      --cyan: #27bfc0;
+      --cyan-dark: #087c89;
+      --cyan-pale: #e7f8f7;
+      --blue-pale: #eef2ff;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { min-width: 320px; min-height: 100vh; margin: 0; color: var(--ink); background: var(--paper); }
+    button { font: inherit; }
+    .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 5; display: flex; width: 315px; flex-direction: column; padding: 22px 16px 16px; color: #eff5fb; background: radial-gradient(circle at 0 0, rgba(39,191,192,.14), transparent 17rem), var(--navy); }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 0 10px 19px; border-bottom: 1px solid #ffffff1a; }
+    .brand-mark { display: grid; width: 42px; height: 42px; place-items: center; border: 1px solid #4ed7d47a; border-radius: 12px; color: #69e2df; background: #27bfc01f; font-size: 12px; font-weight: 850; }
+    .brand-title { font-size: 15px; font-weight: 750; }
+    .brand-subtitle { margin-top: 4px; color: #aab8c9; font-size: 12px; }
+    .nav-heading { margin: 19px 11px 10px; color: #a5b5c8; font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .topic-list { display: grid; flex: 1; min-height: 0; gap: 3px; align-content: start; overflow-y: auto; padding-right: 3px; scrollbar-color: #465a70 transparent; scrollbar-width: thin; }
+    .topic { display: grid; width: 100%; grid-template-columns: 29px 1fr auto; align-items: center; gap: 7px; padding: 8px 9px; border: 0; border-radius: 8px; color: #bdc9d7; background: transparent; text-align: left; cursor: pointer; }
+    .topic:hover { color: #fff; background: #ffffff12; }
+    .topic[aria-current="step"] { color: #fff; background: #27bfc02b; box-shadow: inset 2px 0 #50ded7; }
+    .topic-number { color: #95a6bb; font-size: 12px; font-variant-numeric: tabular-nums; }
+    .topic[aria-current="step"] .topic-number { color: #73e4df; }
+    .topic-name { font-size: 13px; font-weight: 620; line-height: 1.3; }
+    .topic-check { color: #72e0d2; font-size: 12px; }
+    .sidebar-bottom { padding: 12px 10px 0; border-top: 1px solid #ffffff1a; }
+    .sidebar-bottom p { margin: 0; color: #aab8c9; font-size: 12px; line-height: 1.6; }
+    .sidebar-bottom strong { color: #fff; }
+    .main { min-height: 100vh; margin-left: 315px; }
+    .topbar { position: sticky; top: 0; z-index: 3; display: flex; min-height: 68px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 clamp(20px, 4vw, 58px); border-bottom: 1px solid #e0e7efdc; background: #f4f7faeF; backdrop-filter: blur(14px); }
+    .topbar-left, .topbar-right { display: flex; align-items: center; gap: 13px; }
+    .menu-toggle { display: none; }
+    .eyebrow { color: var(--muted); font-size: 13px; font-weight: 750; }
+    .counter { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .counter strong { color: var(--ink); }
+    .progress-track { width: 110px; height: 5px; overflow: hidden; border-radius: 9px; background: #dfe6ec; }
+    .progress-value { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--cyan), #65dbb5); transition: width .25s ease; }
+    .stage { display: flex; min-height: calc(100vh - 68px); flex-direction: column; padding: clamp(22px, 4vw, 50px) clamp(22px, 4.5vw, 62px) 24px; }
+    .slide { display: none; flex: 1; animation: appear .25s ease both; }
+    .slide.is-active { display: block; }
+    @keyframes appear { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .slide-kicker { display: flex; align-items: center; gap: 9px; margin: 0 0 13px; color: var(--cyan-dark); font-size: 13px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .slide-kicker::before { width: 22px; height: 2px; border-radius: 3px; background: var(--cyan); content: ""; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2 { letter-spacing: -.04em; }
+    .slide h1 { max-width: 830px; margin-bottom: 17px; font-size: clamp(42px, 5.5vw, 72px); line-height: 1.05; }
+    .slide h2 { margin-bottom: 14px; font-size: clamp(31px, 3.7vw, 48px); line-height: 1.12; }
+    .lead { max-width: 850px; margin-bottom: 26px; color: var(--muted); font-size: clamp(18px, 1.6vw, 21px); line-height: 1.65; }
+    .accent { color: var(--cyan-dark); }
+    .muted { color: var(--muted); }
+    .cover { position: relative; display: grid; min-height: 600px; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 24px; overflow: hidden; padding: clamp(27px, 4.5vw, 58px); border: 1px solid #e1eeee; border-radius: 24px; background: radial-gradient(circle at 83% 17%, #27bfc021, transparent 20rem), linear-gradient(135deg, #fff, #f0fbfa); box-shadow: 0 22px 60px #14284314; }
+    .cover .slide-kicker { margin-bottom: 20px; }
+    .cover .lead { max-width: 600px; margin-bottom: 25px; }
+    .cover-meta { display: flex; flex-wrap: wrap; gap: 9px; }
+    .pill { padding: 9px 13px; border: 1px solid #dce8eb; border-radius: 99px; color: #43536a; background: #ffffffd9; font-size: 13px; font-weight: 650; }
+    .cover-art { display: grid; min-height: 350px; place-items: center; }
+    .network-art { width: min(100%, 390px); }
+    .grid { display: grid; gap: 15px; }
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .card { padding: 21px; border: 1px solid var(--line); border-radius: 15px; background: var(--white); box-shadow: 0 6px 24px #182b4308; }
+    .card h3 { margin-bottom: 9px; font-size: 19px; letter-spacing: -.015em; }
+    .card p { margin-bottom: 0; color: var(--muted); font-size: 16px; line-height: 1.65; }
+    .card-icon { display: grid; width: 40px; height: 40px; margin-bottom: 14px; place-items: center; border-radius: 11px; color: var(--cyan-dark); background: var(--cyan-pale); font-size: 13px; font-weight: 800; }
+    .callout { display: flex; align-items: flex-start; gap: 13px; margin-top: 19px; padding: 17px 19px; border: 1px solid #c9eeeb; border-radius: 13px; color: #275760; background: #effbfa; font-size: 16px; line-height: 1.65; }
+    .callout strong { color: #126e77; }
+    .callout-mark { flex: none; color: var(--cyan-dark); font-weight: 900; }
+    .compare { display: grid; gap: 6px; padding: 20px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
+    .compare.highlight { border-color: #c4e8e6; background: linear-gradient(145deg, #f2fbfa, #fff); }
+    .compare h3 { margin: 0 0 5px; color: var(--cyan-dark); font-size: 16px; }
+    .compare-row { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid #edf0f3; font-size: 15px; }
+    .compare-row:last-child { border-bottom: 0; }
+    .compare-row span:first-child { color: var(--muted); }
+    .compare-row strong { text-align: right; }
+    .split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .quote { margin: 20px 0 0; padding: 19px 22px; border-left: 3px solid var(--cyan); border-radius: 0 12px 12px 0; color: #41546b; background: #fff; font-size: 19px; font-weight: 650; line-height: 1.6; }
+    .bits { display: grid; grid-template-columns: 5fr 1fr 1fr 2fr; gap: 7px; margin: 18px 0; }
+    .bit { min-height: 84px; padding: 13px; border: 1px solid #dfe9ee; border-radius: 11px; background: #fff; }
+    .bit:first-child { border-color: #bce9e5; background: #effafa; }
+    .bit strong { display: block; margin-bottom: 6px; font-size: 16px; }
+    .bit small { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .flow { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 19px 0; padding: 20px 12px; border: 1px solid var(--line); border-radius: 15px; background: linear-gradient(120deg, #fff, #f3fbfa); }
+    .flow-node { display: grid; min-width: 95px; min-height: 68px; place-items: center; padding: 9px; border: 1px solid #dfe8ed; border-radius: 11px; background: #fff; text-align: center; }
+    .flow-node strong { font-size: 14px; }
+    .flow-node small { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .flow-node.edge { border-color: #bce9e5; background: #effafa; }
+    .flow-arrow { color: #398e91; font-size: 21px; }
+    .stack { display: grid; max-width: 740px; gap: 8px; margin: 0 auto 17px; }
+    .stack-row { display: grid; grid-template-columns: 115px 1fr auto; align-items: center; gap: 12px; padding: 13px 16px; border: 1px solid #e2eaf0; border-radius: 10px; background: #fff; font-size: 15px; }
+    .stack-row strong { color: var(--cyan-dark); }
+    .stack-row small { color: var(--muted); font-size: 13px; }
+    .stack-row.transport { border-color: #bce9e5; background: #effafa; }
+    .three-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0 18px; }
+    .step { padding: 16px; border-radius: 12px; background: var(--blue-pale); }
+    .step:nth-child(2) { background: var(--cyan-pale); }
+    .step:nth-child(3) { background: #fff2e5; }
+    .step b { display: block; margin-bottom: 6px; font-size: 15px; }
+    .step span { color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 14px 15px; border-bottom: 1px solid #edf0f3; font-size: 14px; line-height: 1.45; }
+    th { color: var(--muted); background: #f8fafb; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+    td { color: #34445a; }
+    tr:last-child td { border-bottom: 0; }
+    td strong { color: var(--ink); }
+    .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; margin: 17px 0; }
+    .timeline-item { padding: 16px; border-top: 3px solid #bde9e5; border-radius: 0 0 12px 12px; background: #fff; }
+    .timeline-item b { display: block; margin-bottom: 7px; color: var(--cyan-dark); font-size: 15px; }
+    .timeline-item p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .glossary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+    .term { padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: white; }
+    .term strong { display: block; margin-bottom: 5px; color: var(--cyan-dark); font-size: 14px; }
+    .term span { color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .interactive { margin: 16px 0; padding: 19px; border: 1px solid #cfe8e8; border-radius: 15px; background: #f8fdfd; }
+    .interactive h3 { margin-bottom: 8px; font-size: 18px; }
+    .interactive p { margin-bottom: 0; color: var(--muted); font-size: 16px; line-height: 1.6; }
+    .choice-row { display: flex; flex-wrap: wrap; gap: 9px; margin: 13px 0; }
+    .choice { padding: 10px 14px; border: 1px solid #ccdcdf; border-radius: 9px; color: var(--ink); background: #fff; font-size: 14px; font-weight: 650; cursor: pointer; }
+    .choice:hover, .choice[aria-pressed="true"] { border-color: var(--cyan); background: var(--cyan-pale); }
+    .walk-panel { min-height: 77px; padding: 13px 15px; border-radius: 10px; background: #fff; }
+    .walk-panel strong { display: block; margin-bottom: 5px; color: var(--cyan-dark); font-size: 15px; }
+    .walk-panel span { color: var(--muted); font-size: 15px; line-height: 1.55; }
+    details { margin-top: 12px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 11px; background: white; }
+    summary { color: var(--cyan-dark); font-size: 15px; font-weight: 700; cursor: pointer; }
+    details p { margin: 10px 0 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
+    .slide-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 25px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .keyboard-hint { color: #64758a; font-size: 13px; }
+    kbd { padding: 3px 7px; border: 1px solid #d9e0e7; border-radius: 5px; color: #586980; background: white; font: inherit; }
+    .control-group { display: flex; gap: 8px; }
+    .control { display: inline-flex; min-height: 43px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 1px solid #dce4eb; border-radius: 10px; color: #34445a; background: #fff; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .control.primary { border-color: var(--navy); color: #fff; background: var(--navy); }
+    .control:disabled { opacity: .45; cursor: not-allowed; }
+    .mobile-scrim { display: none; }
+    @media (max-width: 1080px) {
+      .sidebar { width: 285px; }
+      .main { margin-left: 285px; }
+      .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .cover { grid-template-columns: 1fr .8fr; }
+    }
+    @media (max-width: 760px) {
+      .sidebar { width: min(310px, 86vw); transform: translateX(-102%); transition: transform .23s ease; }
+      .sidebar.is-open { transform: translateX(0); }
+      .mobile-scrim.is-open { position: fixed; inset: 0; z-index: 4; display: block; background: #0a14246b; }
+      .main { margin-left: 0; }
+      .topbar { min-height: 60px; padding: 0 16px; }
+      .topbar-left { min-width: 0; gap: 9px; }
+      .menu-toggle { display: inline-grid; width: 37px; height: 37px; flex: none; place-items: center; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background: #fff; cursor: pointer; }
+      .eyebrow { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+      .progress-track { width: 66px; }
+      .stage { min-height: calc(100vh - 60px); padding: 23px 17px 17px; }
+      .cover { min-height: 0; grid-template-columns: 1fr; gap: 4px; padding: 29px 22px 18px; }
+      .cover-art { min-height: 230px; }
+      .network-art { max-width: 300px; }
+      .grid-2, .grid-3, .split { grid-template-columns: 1fr; }
+      .timeline { grid-template-columns: repeat(2, 1fr); }
+      .glossary { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .grid-4 { grid-template-columns: 1fr; }
+      .flow { gap: 4px; padding: 13px 5px; }
+      .flow-node { min-width: 60px; min-height: 57px; padding: 5px; }
+      .flow-node strong { font-size: 11px; }
+      .flow-node small { font-size: 10px; }
+      .flow-arrow { font-size: 14px; }
+      .bits { grid-template-columns: 1fr 1fr; }
+      .three-steps { grid-template-columns: 1fr; }
+      .stack-row { grid-template-columns: 80px 1fr; gap: 7px; }
+      .stack-row small { grid-column: 2; }
+      .keyboard-hint { display: none; }
+      .timeline { grid-template-columns: 1fr 1fr; }
+      th, td { padding: 10px; }
+      .compare-row { font-size: 14px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Subtemas de la exposición">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">MPLS</div><div><div class="brand-title">Redes de operador</div><div class="brand-subtitle">Arquitectura · Operación · Aplicaciones</div></div></div>
+      <p class="nav-heading">Subtemas de exposición</p>
+      <nav class="topic-list" id="topic-list"></nav>
+      <div class="sidebar-bottom"><p><strong>Presentación interactiva</strong><br>Usa ← → para cambiar de diapositiva</p></div>
+    </aside>
+    <div class="mobile-scrim" id="mobile-scrim" aria-hidden="true"></div>
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left"><button class="menu-toggle" id="menu-toggle" aria-label="Abrir menú" aria-expanded="false">☰</button><span class="eyebrow" id="section-name">MPLS</span></div>
+        <div class="topbar-right"><div class="progress-track" role="progressbar" aria-label="Progreso de la presentación" aria-valuemin="1" aria-valuemax="20" aria-valuenow="1"><div class="progress-value" id="progress-value"></div></div><span class="counter"><strong id="current-number">01</strong> / <span id="total-number">20</span></span></div>
+      </header>
+      <div class="stage">
+        <section class="slide is-active" data-title="MPLS: Arquitectura, Operación y Aplicaciones" aria-labelledby="slide-title-1">
+          <div class="cover">
+            <div>
+              <p class="slide-kicker">Redes de operador · Nivel avanzado</p>
+              <h1 id="slide-title-1">MPLS:<br><span class="accent">Arquitectura, Operación y Aplicaciones</span></h1>
+              <p class="lead">De la etiqueta al servicio: una explicación paso a paso de cómo MPLS transporta tráfico, conecta redes y ayuda a operar servicios de proveedor.</p>
+              <div class="cover-meta"><span class="pill">20 diapositivas</span><span class="pill">Fundamentos, servicios y operación</span></div>
+            </div>
+            <div class="cover-art" aria-label="Diagrama de routers unidos por un camino MPLS">
+              <svg class="network-art" viewBox="0 0 390 330" role="img" aria-label="Un paquete atraviesa routers de ingreso, núcleo y egreso">
+                <defs><linearGradient id="route" x1="0" x2="1"><stop stop-color="#27bfc0"/><stop offset="1" stop-color="#75a4ff"/></linearGradient></defs>
+                <path d="M54 165 C105 165 96 85 157 85 S213 245 272 245 S300 165 343 165" fill="none" stroke="#d8e7eb" stroke-width="13" stroke-linecap="round"/>
+                <path d="M54 165 C105 165 96 85 157 85 S213 245 272 245 S300 165 343 165" fill="none" stroke="url(#route)" stroke-width="4" stroke-dasharray="8 7" stroke-linecap="round"/>
+                <g fill="#fff" stroke="#c9dadd" stroke-width="2"><circle cx="54" cy="165" r="24"/><circle cx="157" cy="85" r="24"/><circle cx="216" cy="177" r="24"/><circle cx="272" cy="245" r="24"/><circle cx="343" cy="165" r="24"/></g>
+                <g fill="#087c89" font-family="system-ui" font-size="11" font-weight="700" text-anchor="middle"><text x="54" y="169">PE</text><text x="157" y="89">P</text><text x="216" y="181">P</text><text x="272" y="249">P</text><text x="343" y="169">PE</text></g>
+                <g fill="#687d91" font-family="system-ui" font-size="9" text-anchor="middle"><text x="54" y="205">INGRESO</text><text x="157" y="46">NÚCLEO</text><text x="216" y="218">NÚCLEO</text><text x="272" y="286">NÚCLEO</text><text x="343" y="205">EGRESO</text></g>
+              </svg>
+            </div>
+          </div>
+        </section>
+        <section class="slide" data-title="Objetivos y agenda" aria-labelledby="slide-title-2">
+          <p class="slide-kicker">02 · Orientación</p><h2 id="slide-title-2">Objetivos y agenda</h2>
+          <p class="lead">Al finalizar, podrás explicar qué hace una etiqueta, cómo se construye un servicio y qué revisar cuando algo falla.</p>
+          <div class="grid grid-2">
+            <article class="card"><div class="card-icon">01</div><h3>Interpretar forwarding</h3><p>Leer la pila de etiquetas, distinguir roles PE/P y seguir las entradas de la LFIB.</p></article>
+            <article class="card"><div class="card-icon">02</div><h3>Relacionar protocolos</h3><p>Entender el papel de IGP, LDP, RSVP-TE y MP-BGP dentro de la red.</p></article>
+            <article class="card"><div class="card-icon">03</div><h3>Explicar servicios</h3><p>Conectar los conceptos de VRF, RD y RT con VPN de capa 3 y servicios Ethernet.</p></article>
+            <article class="card"><div class="card-icon">04</div><h3>Diseñar y operar</h3><p>Aplicar criterios de ingeniería de tráfico, QoS, resiliencia y seguridad.</p></article>
+          </div>
+          <div class="callout"><span class="callout-mark">↗</span><span><strong>Recorrido:</strong> fundamentos → arquitectura → señalización y VPN → TE, QoS y resiliencia → seguridad y evolución.</span></div>
+        </section>
+        <section class="slide" data-title="El problema que resuelve MPLS" aria-labelledby="slide-title-3">
+          <p class="slide-kicker">03 · Motivación</p><h2 id="slide-title-3">El problema que resuelve MPLS</h2>
+          <p class="lead">IP tradicional toma una decisión de reenvío en cada router a partir del destino. MPLS permite asociar el tráfico a un camino y a un servicio definido por el operador.</p>
+          <div class="split">
+            <article class="compare"><h3>IP tradicional</h3><div class="compare-row"><span>Decisión</span><strong>Prefijo más específico</strong></div><div class="compare-row"><span>Camino</span><strong>Lo elige el IGP</strong></div><div class="compare-row"><span>Servicios</span><strong>Se agregan por separado</strong></div><div class="compare-row"><span>Tránsito</span><strong>Consulta la ruta IP</strong></div></article>
+            <article class="compare highlight"><h3>Con MPLS</h3><div class="compare-row"><span>Decisión en el core</span><strong>Consulta una etiqueta</strong></div><div class="compare-row"><span>Camino</span><strong>LSP asociado a una FEC</strong></div><div class="compare-row"><span>Servicios</span><strong>VPN, TE y QoS</strong></div><div class="compare-row"><span>Tránsito</span><strong>Conmuta etiquetas</strong></div></article>
+          </div>
+          <div class="quote">La etiqueta permite que el núcleo reenvíe tráfico sin tener que interpretar en cada salto todos los detalles del servicio del cliente.</div>
+        </section>
+        <section class="slide" data-title="Definición, origen y posición en OSI" aria-labelledby="slide-title-4">
+          <p class="slide-kicker">04 · Fundamentos</p><h2 id="slide-title-4">Definición, origen y posición en OSI</h2>
+          <p class="lead">MPLS (Multiprotocol Label Switching) reenvía paquetes usando etiquetas cortas asociadas a una clase de equivalencia de forwarding (FEC). Estandarizado por IETF, integra transporte, control de tráfico y servicios VPN.</p>
+          <div class="split">
+            <article class="card"><h3>¿Qué significa “capa 2.5”?</h3><p>Es una forma informal de explicar que la cabecera MPLS se inserta entre la cabecera de enlace (por ejemplo, Ethernet) y el paquete de red (por ejemplo, IP). No es una capa OSI formal ni reemplaza las capas existentes.</p></article>
+            <div class="stack"><div class="stack-row"><strong>7–4</strong><span>Aplicación y transporte</span></div><div class="stack-row"><strong>3 · Red</strong><span>IP</span></div><div class="stack-row transport"><strong>2.5</strong><span>MPLS · etiquetas</span></div><div class="stack-row"><strong>2</strong><span>Enlace · Ethernet / PPP</span></div><div class="stack-row"><strong>1</strong><span>Física</span></div></div>
+          </div>
+          <details><summary>¿Por qué surgió MPLS?</summary><p>Las redes de operador necesitaban combinar la eficiencia del switching, el encaminamiento IP y mecanismos para construir VPN y controlar el uso de enlaces. MPLS unificó esas funciones bajo un plano de etiquetas.</p></details>
+        </section>
+        <section class="slide" data-title="Conceptos clave de MPLS" aria-labelledby="slide-title-5">
+          <p class="slide-kicker">05 · Vocabulario</p><h2 id="slide-title-5">Conceptos clave de MPLS</h2>
+          <p class="lead">Estos cuatro términos explican quién clasifica el tráfico, qué camino toma y qué hace cada router.</p>
+          <div class="grid grid-2">
+            <article class="card"><div class="card-icon">FEC</div><h3>Forwarding Equivalence Class</h3><p>Grupo de paquetes que recibirá el mismo tratamiento. Por ejemplo, los que van hacia un mismo prefijo o pertenecen a una VPN.</p></article>
+            <article class="card"><div class="card-icon">LSP</div><h3>Label Switched Path</h3><p>Camino unidireccional que recorre el tráfico al ser reenviado mediante etiquetas.</p></article>
+            <article class="card"><div class="card-icon">LSR</div><h3>Label Switching Router</h3><p>Router MPLS que consulta una etiqueta entrante y aplica una acción: reemplazarla o retirarla.</p></article>
+            <article class="card"><div class="card-icon">LER</div><h3>Label Edge Router</h3><p>Router de borde que clasifica el tráfico al ingresar y termina el tratamiento MPLS al egresar. En VPN se denomina habitualmente PE.</p></article>
+          </div>
+          <div class="flow"><div class="flow-node edge"><strong>LER / PE</strong><small>clasifica y añade</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>LSR / P</strong><small>conmuta</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>LSR / P</strong><small>conmuta</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>LER / PE</strong><small>retira etiqueta</small></div></div>
+        </section>
+        <section class="slide" data-title="Cabecera MPLS: 32 bits que gobiernan el salto" aria-labelledby="slide-title-6">
+          <p class="slide-kicker">06 · Formato</p><h2 id="slide-title-6">Cabecera MPLS: 32 bits que gobiernan el salto</h2>
+          <p class="lead">Cada entrada de la pila MPLS ocupa 4 bytes. Selecciona un campo para ver cómo se usa durante el forwarding.</p>
+          <div class="bits" aria-label="Campos de la cabecera MPLS de 32 bits">
+            <div class="bit"><strong>LABEL · 20 bits</strong><small>Identifica el tratamiento local</small></div><div class="bit"><strong>TC · 3</strong><small>Clase de tráfico</small></div><div class="bit"><strong>S · 1</strong><small>Fin de pila</small></div><div class="bit"><strong>TTL · 8</strong><small>Límite de saltos</small></div>
+          </div>
+          <div class="interactive"><h3>Explora los campos</h3><div class="choice-row"><button class="choice" data-info-target="header-info" data-info-title="Label · 20 bits" data-info-text="Es el valor que consulta el siguiente router en su LFIB. Las etiquetas tienen significado local al enlace o al salto; no son identificadores globales del servicio.">Label</button><button class="choice" data-info-target="header-info" data-info-title="TC · 3 bits" data-info-text="Traffic Class sirve para transportar información de clase de servicio. La política de QoS se aplica con colas, scheduling, policing y descarte en los equipos.">TC</button><button class="choice" data-info-target="header-info" data-info-title="S · 1 bit" data-info-text="El bit Bottom of Stack marca si esta es la última etiqueta de la pila: S=1 indica que no hay otra etiqueta MPLS debajo.">S</button><button class="choice" data-info-target="header-info" data-info-title="TTL · 8 bits" data-info-text="Se decrementa al avanzar para limitar bucles, de forma análoga al TTL de IP. El tratamiento del TTL también afecta a la visibilidad de traceroute.">TTL</button></div><div class="walk-panel" id="header-info" aria-live="polite"><strong>Elige un campo</strong><span>Los 32 bits juntos controlan el tratamiento MPLS de este salto.</span></div></div>
+        </section>
+        <section class="slide" data-title="Pila de etiquetas y operaciones" aria-labelledby="slide-title-7">
+          <p class="slide-kicker">07 · Forwarding</p><h2 id="slide-title-7">Pila de etiquetas y operaciones</h2>
+          <p class="lead">Un paquete puede llevar varias etiquetas. La exterior suele llevarlo por el transporte; la interior puede indicar el servicio o la VPN en el PE de destino.</p>
+          <div class="stack"><div class="stack-row transport"><strong>Exterior</strong><span>Transporte · LSP hacia el PE destino</span><small>Label 240</small></div><div class="stack-row"><strong>Interior</strong><span>Servicio · contexto VPN / forwarding</span><small>Label 32</small></div><div class="stack-row"><strong>Payload</strong><span>Paquete original del cliente</span><small>IP</small></div></div>
+          <div class="three-steps"><div class="step"><b>PUSH</b><span>Añade una etiqueta al ingresar al dominio o al asociar el servicio.</span></div><div class="step"><b>SWAP</b><span>Reemplaza la etiqueta por otra que el vecino anunció.</span></div><div class="step"><b>POP</b><span>Retira una etiqueta al aproximarse al destino o al salir del dominio.</span></div></div>
+          <div class="callout"><span class="callout-mark">i</span><span><strong>Penultimate Hop Popping (PHP):</strong> el penúltimo router puede retirar la etiqueta exterior antes de llegar al PE de egreso. La etiqueta interior, si existe, se conserva.</span></div>
+        </section>
+        <section class="slide" data-title="Arquitectura del dominio MPLS" aria-labelledby="slide-title-8">
+          <p class="slide-kicker">08 · Topología</p><h2 id="slide-title-8">Arquitectura del dominio MPLS</h2>
+          <p class="lead">Los equipos de borde conectan las redes del cliente con el proveedor. Los routers P forman el núcleo de transporte.</p>
+          <div class="flow"><div class="flow-node"><strong>CE</strong><small>equipo del cliente</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>PE ingreso</strong><small>VRF y clasificación</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>P</strong><small>núcleo MPLS</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>P</strong><small>núcleo MPLS</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>PE egreso</strong><small>servicio destino</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>CE</strong><small>sede remota</small></div></div>
+          <div class="grid grid-3"><article class="card"><h3>CE · Customer Edge</h3><p>Equipo del cliente. Intercambia rutas IP o Ethernet con el PE; no necesita ser consciente de MPLS.</p></article><article class="card"><h3>PE · Provider Edge</h3><p>Borde del operador. Mantiene servicios como VRF y participa en el control de las VPN.</p></article><article class="card"><h3>P · Provider</h3><p>Router del núcleo. Conmuta etiquetas de transporte y no necesita conocer las rutas privadas de los clientes.</p></article></div>
+        </section>
+        <section class="slide" data-title="Recorrido de un paquete: sucursal → sede" aria-labelledby="slide-title-9">
+          <p class="slide-kicker">09 · Paso a paso</p><h2 id="slide-title-9">Recorrido de un paquete: sucursal → sede</h2>
+          <p class="lead">Sigue un paquete IP desde una sucursal hasta otra. Pulsa cada equipo para ver qué ocurre en ese punto del camino.</p>
+          <div class="flow"><div class="flow-node"><strong>1 · CE</strong><small>IP 10.1.0.8</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>2 · PE</strong><small>PUSH 101</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>3 · P1</strong><small>SWAP 101→77</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>4 · P2</strong><small>SWAP 77→24</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>5 · PE</strong><small>POP y entrega</small></div></div>
+          <div class="interactive"><div class="choice-row"><button class="choice" data-info-target="packet-info" data-info-title="1 · El CE envía el paquete" data-info-text="El router del cliente encamina el paquete IP hacia su proveedor usando la conectividad de acceso habitual. Todavía no necesita conocer el core MPLS.">CE</button><button class="choice" data-info-target="packet-info" data-info-title="2 · El PE de ingreso clasifica" data-info-text="El PE consulta la interfaz y la VRF del cliente, determina la FEC y añade la etiqueta o pila de etiquetas correspondiente.">PE ingress</button><button class="choice" data-info-target="packet-info" data-info-title="3–4 · Los routers P conmutan" data-info-text="Cada P consulta la etiqueta entrante en su LFIB y aplica la acción local indicada. No inspecciona la ruta privada del cliente.">Core P</button><button class="choice" data-info-target="packet-info" data-info-title="5 · El PE de egreso entrega" data-info-text="El PE de destino retira la etiqueta de servicio, identifica el contexto VPN y reenvía el paquete IP por la interfaz de la sede destino.">PE egress</button></div><div class="walk-panel" id="packet-info" aria-live="polite"><strong>Selecciona un punto del camino</strong><span>El router de ingreso clasifica el paquete; el núcleo conmuta etiquetas; el PE remoto lo entrega al servicio correcto.</span></div></div>
+          <div class="callout"><span class="callout-mark">↗</span><span>La etiqueta de cada salto puede cambiar. El significado de la etiqueta que recibe un router depende de su propia tabla de forwarding.</span></div>
+        </section>
+        <section class="slide" data-title="Plano de control y plano de datos" aria-labelledby="slide-title-10">
+          <p class="slide-kicker">10 · Separación funcional</p><h2 id="slide-title-10">Plano de control y plano de datos</h2>
+          <p class="lead">Separarlos ayuda a entender por qué una red puede aprender rutas correctamente pero aun así no reenviar un paquete, o viceversa.</p>
+          <div class="grid grid-2"><article class="card"><div class="card-icon">CONTROL</div><h3>Decide qué rutas y etiquetas usar</h3><p>IGP intercambia topología; LDP o RSVP-TE distribuyen información de transporte; MP-BGP anuncia rutas VPN. La RIB y la LIB guardan información aprendida.</p></article><article class="card"><div class="card-icon">DATOS</div><h3>Reenvía cada paquete</h3><p>La FIB contiene decisiones IP y la LFIB acciones para etiquetas: etiqueta de entrada → acción → salida. El ASIC las ejecuta a velocidad de línea.</p></article></div>
+          <div class="flow"><div class="flow-node"><strong>RIB / LIB</strong><small>información de control</small></div><span class="flow-arrow">↓ programa</span><div class="flow-node edge"><strong>FIB / LFIB</strong><small>decisiones instaladas</small></div><span class="flow-arrow">↓ aplica</span><div class="flow-node"><strong>Paquete</strong><small>push · swap · pop</small></div></div>
+          <div class="callout"><span class="callout-mark">!</span><span>Al diagnosticar, verifica tanto el estado del protocolo y sus rutas como las entradas instaladas en FIB/LFIB y los contadores de interfaz.</span></div>
+        </section>
+        <section class="slide" data-title="Distribución de etiquetas con LDP" aria-labelledby="slide-title-11">
+          <p class="slide-kicker">11 · Señalización</p><h2 id="slide-title-11">Distribución de etiquetas con LDP</h2>
+          <p class="lead">LDP (Label Distribution Protocol) permite que routers vecinos anuncien qué etiqueta usar para alcanzar una FEC. En el uso común, la FEC está vinculada a un prefijo IGP.</p>
+          <div class="three-steps"><div class="step"><b>1 · Descubrir</b><span>Mensajes Hello sobre UDP identifican vecinos LDP en enlaces habilitados.</span></div><div class="step"><b>2 · Establecer sesión</b><span>Los routers abren una sesión TCP, normalmente en el puerto 646.</span></div><div class="step"><b>3 · Anunciar etiquetas</b><span>Label Mapping relaciona una FEC con una etiqueta; cada vecino programa su LFIB.</span></div></div>
+          <div class="flow"><div class="flow-node"><strong>LSR A</strong><small>label 40</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>LSR B</strong><small>label 22</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>LSR C</strong><small>FEC 10.0.0.0/8</small></div></div>
+          <details><summary>¿Qué revisar si no se instala el LSP?</summary><p>Alcance IP del router-id, vecinos y sesión LDP, sincronización con IGP cuando se use, etiqueta anunciada por el siguiente salto y entrada resultante en la LFIB.</p></details>
+        </section>
+        <section class="slide" data-title="RSVP-TE: caminos explícitos con restricciones" aria-labelledby="slide-title-12">
+          <p class="slide-kicker">12 · Ingeniería de tráfico</p><h2 id="slide-title-12">RSVP-TE: caminos explícitos con restricciones</h2>
+          <p class="lead">RSVP-TE permite establecer un LSP que siga un trayecto compatible con requisitos de red, en vez de limitarse siempre al camino más corto del IGP.</p>
+          <div class="flow"><div class="flow-node edge"><strong>Ingress</strong><small>calcula y señaliza</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>P1</strong><small>restricciones</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>P3</strong><small>ruta elegida</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>Egress</strong><small>recibe LSP</small></div></div>
+          <div class="grid grid-3"><article class="card"><h3>CSPF</h3><p>Calcula una ruta que satisface ancho de banda, afinidades y prioridades configuradas.</p></article><article class="card"><h3>PATH</h3><p>El ingreso señaliza hacia el egreso el camino solicitado y las características de la reserva.</p></article><article class="card"><h3>RESV</h3><p>La respuesta confirma recursos y etiquetas a lo largo del trayecto cuando se puede establecer el LSP.</p></article></div>
+          <div class="callout"><span class="callout-mark">↗</span><span>El camino más corto puede rechazarse si no dispone, por ejemplo, del 1 Gb/s solicitado. El diseño debe contemplar prioridades y qué sucede al no encontrar recursos.</span></div>
+        </section>
+        <section class="slide" data-title="MP-BGP y VPN MPLS de capa 3" aria-labelledby="slide-title-13">
+          <p class="slide-kicker">13 · Servicios</p><h2 id="slide-title-13">MP-BGP y VPN MPLS de capa 3</h2>
+          <p class="lead">Una L3VPN permite que varias sedes intercambien rutas privadas a través del proveedor, manteniendo tablas de cliente separadas en los PE.</p>
+          <div class="grid grid-3"><article class="card"><div class="card-icon">VRF</div><h3>Tabla por servicio</h3><p>Guarda rutas y decisiones de forwarding de un cliente o dominio independiente.</p></article><article class="card"><div class="card-icon">RD</div><h3>Route Distinguisher</h3><p>Hace única una ruta VPN cuando distintos clientes usan el mismo prefijo IPv4/IPv6.</p></article><article class="card"><div class="card-icon">RT</div><h3>Route Target</h3><p>Atributo BGP que controla qué rutas se exportan e importan en cada VRF.</p></article></div>
+          <div class="flow"><div class="flow-node edge"><strong>VRF ACME</strong><small>RD 65000:10</small></div><span class="flow-arrow">↔</span><div class="flow-node"><strong>MP-BGP</strong><small>VPNv4 / VPNv6</small></div><span class="flow-arrow">↔</span><div class="flow-node edge"><strong>VRF ACME</strong><small>import RT 65000:100</small></div></div>
+          <div class="callout"><span class="callout-mark">i</span><span><strong>RD no es RT:</strong> RD diferencia rutas; RT define su distribución entre VRF. MP-BGP propaga la ruta VPN y la etiqueta de servicio hasta el PE remoto.</span></div>
+        </section>
+        <section class="slide" data-title="VPN de capa 2: VPWS y VPLS" aria-labelledby="slide-title-14">
+          <p class="slide-kicker">14 · Servicios Ethernet</p><h2 id="slide-title-14">VPN de capa 2: VPWS y VPLS</h2>
+          <p class="lead">Mientras una L3VPN conecta redes IP mediante rutas, una VPN de capa 2 entrega un servicio Ethernet al cliente.</p>
+          <div class="grid grid-2"><article class="card"><div class="card-icon">P2P</div><h3>VPWS · punto a punto</h3><p>Emula un circuito Ethernet entre dos ubicaciones. Desde el punto de vista del cliente se comporta de forma parecida a un cable virtual.</p><div class="flow"><div class="flow-node"><strong>CE A</strong></div><span class="flow-arrow">↔</span><div class="flow-node edge"><strong>VPWS</strong></div><span class="flow-arrow">↔</span><div class="flow-node"><strong>CE B</strong></div></div></article><article class="card"><div class="card-icon">MP</div><h3>VPLS · multipunto</h3><p>Interconecta varias sedes como una LAN extendida. Los PE aprenden direcciones MAC y replican tráfico BUM (broadcast, unknown unicast y multicast).</p><div class="flow"><div class="flow-node"><strong>CE A</strong></div><span class="flow-arrow">↘</span><div class="flow-node edge"><strong>VPLS</strong></div><span class="flow-arrow">↗</span><div class="flow-node"><strong>CE B / C</strong></div></div></article></div>
+          <details><summary>Un punto para considerar en operación</summary><p>El dominio de capa 2 amplía el alcance de broadcasts y aprendizaje MAC. Hay que dimensionar la replicación y evitar bucles, movimientos MAC inesperados y dominios excesivamente grandes.</p></details>
+        </section>
+        <section class="slide" data-title="Ingeniería de tráfico: decidir con intención" aria-labelledby="slide-title-15">
+          <p class="slide-kicker">15 · Optimización</p><h2 id="slide-title-15">Ingeniería de tráfico: decidir con intención</h2>
+          <p class="lead">La ingeniería de tráfico permite distribuir carga por la red y elegir caminos que respeten los objetivos del servicio, en vez de asumir que el shortest path siempre es el mejor.</p>
+          <div class="grid grid-2"><article class="card"><div class="card-icon">01</div><h3>Restricciones</h3><p>Ancho de banda, latencia y grupos de riesgo compartido (SRLG).</p></article><article class="card"><div class="card-icon">02</div><h3>Afinidades</h3><p>Colores administrativos para incluir o excluir enlaces por política.</p></article><article class="card"><div class="card-icon">03</div><h3>Prioridad</h3><p>Ordena el establecimiento y permite definir la preempción de recursos.</p></article><article class="card"><div class="card-icon">04</div><h3>Balanceo</h3><p>Usa ECMP, múltiples LSP o políticas para aprovechar enlaces alternativos.</p></article></div>
+          <div class="callout"><span class="callout-mark">↗</span><span><strong>Objetivo operativo:</strong> utilizar la red completa sin sacrificar SLA ni resiliencia. La ingeniería necesita telemetría y revisión continua; una ruta configurada no garantiza por sí sola un buen reparto.</span></div>
+        </section>
+        <section class="slide" data-title="Calidad de servicio: TC + DiffServ" aria-labelledby="slide-title-16">
+          <p class="slide-kicker">16 · Tratamiento por clase</p><h2 id="slide-title-16">Calidad de servicio: TC + DiffServ</h2>
+          <p class="lead">DiffServ clasifica paquetes por comportamiento esperado. El campo TC de MPLS puede llevar esa clase por el core para que los equipos apliquen la política adecuada.</p>
+          <div class="table-wrap"><table><thead><tr><th>Clase ilustrativa</th><th>Tratamiento esperado</th><th>Ejemplo</th></tr></thead><tbody><tr><td><strong>Tiempo real · EF</strong></td><td>Baja latencia; prioridad limitada para no bloquear otras clases</td><td>Voz</td></tr><tr><td><strong>Crítica · AF4x</strong></td><td>Menor probabilidad de descarte y recursos acordados</td><td>Vídeo / control</td></tr><tr><td><strong>Negocio · AF2x</strong></td><td>Ancho de banda definido por política</td><td>Aplicaciones corporativas</td></tr><tr><td><strong>Best effort · BE</strong></td><td>Cola estándar</td><td>Internet general</td></tr></tbody></table></div>
+          <div class="three-steps"><div class="step"><b>Clasificar y marcar</b><span>Identificar aplicación y mapear DSCP/TC.</span></div><div class="step"><b>Controlar el ingreso</b><span>Aplicar policing o shaping al tráfico.</span></div><div class="step"><b>Gestionar congestión</b><span>Configurar colas, scheduling y descarte en cada cuello de botella.</span></div></div>
+          <div class="callout"><span class="callout-mark">!</span><span>TC no reserva ancho de banda por sí solo. La garantía depende de una política coherente extremo a extremo y del dimensionamiento de cada enlace.</span></div>
+        </section>
+        <section class="slide" data-title="Protección y alta disponibilidad" aria-labelledby="slide-title-17">
+          <p class="slide-kicker">17 · Resiliencia</p><h2 id="slide-title-17">Protección y alta disponibilidad</h2>
+          <p class="lead">La resiliencia combina detección de fallas, un camino alternativo y reconvergencia. Para cumplir un SLA también hay que probar los tiempos y el comportamiento real ante fallos.</p>
+          <div class="timeline"><div class="timeline-item"><b>1 · Detectar</b><p>BFD puede identificar rápidamente que un vecino o enlace dejó de responder.</p></div><div class="timeline-item"><b>2 · Conmutar</b><p>FRR usa una alternativa local para reducir el impacto sin esperar al IGP.</p></div><div class="timeline-item"><b>3 · Reconverger</b><p>IGP o TE calcula el camino estable tras el cambio topológico.</p></div><div class="timeline-item"><b>4 · Verificar</b><p>Medir pérdida, latencia, alarmas y recuperación con pruebas programadas.</p></div></div>
+          <div class="flow"><div class="flow-node"><strong>Camino primario</strong><small>tráfico normal</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>Falla detectada</strong><small>BFD</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>Backup FRR</strong><small>conmutación local</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>IGP / TE</strong><small>reconvergencia</small></div></div>
+          <details><summary>¿Por qué probar el camino de respaldo?</summary><p>Puede no estar instalado, compartir el mismo riesgo físico que el primario o no tener capacidad suficiente. Una prueba controlada confirma que la protección funciona y mantiene la calidad esperada.</p></details>
+        </section>
+        <section class="slide" data-title="Seguridad en MPLS: aislamiento no es cifrado" aria-labelledby="slide-title-18">
+          <p class="slide-kicker">18 · Riesgo operativo</p><h2 id="slide-title-18">Seguridad en MPLS: aislamiento no es cifrado</h2>
+          <p class="lead">Una VPN MPLS separa rutas de clientes mediante políticas y tablas independientes. Eso no cifra el contenido ni reemplaza la seguridad del plano de control y de gestión.</p>
+          <div class="grid grid-2"><article class="card"><h3>Etiqueta no confiable</h3><p>Filtrar MPLS desde puertos de cliente y aceptar etiquetas solo en las interfaces previstas.</p></article><article class="card"><h3>DoS al plano de control</h3><p>Usar CoPP, límites de sesiones y autenticación donde sea compatible y esté configurada.</p></article><article class="card"><h3>Error de RT o VRF</h3><p>Aplicar plantillas, revisión de cambios y validación de rutas importadas/exportadas.</p></article><article class="card"><h3>Confidencialidad</h3><p>Si se requiere cifrado del transporte, evaluar IPsec o MACsec según el punto de protección y el modelo de amenaza.</p></article></div>
+          <div class="callout"><span class="callout-mark">!</span><span><strong>Principio:</strong> proteger los planos de control, datos y gestión; auditar el aprovisionamiento de extremo a extremo. Aislamiento no equivale a privacidad criptográfica.</span></div>
+        </section>
+        <section class="slide" data-title="Comparación tecnológica equilibrada" aria-labelledby="slide-title-19">
+          <p class="slide-kicker">19 · Decisión de arquitectura</p><h2 id="slide-title-19">Comparación tecnológica equilibrada</h2>
+          <p class="lead">No existe una tecnología ganadora para todos los casos. La elección depende de SLA, cobertura, operación, automatización, cifrado y coste total.</p>
+          <div class="table-wrap"><table><thead><tr><th>Criterio</th><th>MPLS</th><th>Segment Routing</th><th>SD-WAN</th><th>VPN por Internet</th></tr></thead><tbody><tr><td><strong>Complejidad</strong></td><td>Alta</td><td>Media-alta</td><td>Media</td><td>Baja</td></tr><tr><td><strong>Escalabilidad</strong></td><td>Alta</td><td>Muy alta en core</td><td>Alta</td><td>Media</td></tr><tr><td><strong>Fortaleza</strong></td><td>SLA y transporte de operador</td><td>Core programable</td><td>Gestión de sucursales</td><td>Acceso económico</td></tr><tr><td><strong>Seguridad típica</strong></td><td>Aislamiento; cifrado aparte</td><td>Depende del servicio</td><td>Overlay con cifrado configurable</td><td>Túnel cifrado</td></tr><tr><td><strong>Uso común</strong></td><td>Core / VPN empresarial</td><td>Transporte automatizado</td><td>Sedes multi-enlace</td><td>Sitios pequeños / backup</td></tr></tbody></table></div>
+          <div class="callout"><span class="callout-mark">↗</span><span>Las arquitecturas pueden combinarse: por ejemplo, SD-WAN en sucursales con transporte MPLS y enlaces de Internet cifrados como respaldo.</span></div>
+        </section>
+        <section class="slide" data-title="Casos de uso, tendencias y conclusiones" aria-labelledby="slide-title-20">
+          <p class="slide-kicker">20 · Cierre</p><h2 id="slide-title-20">Casos de uso, tendencias y conclusiones</h2>
+          <p class="lead">MPLS continúa siendo una pieza útil en redes de operador y servicios empresariales. Comprender el camino del paquete ayuda a explicar también el valor y los límites de la tecnología.</p>
+          <div class="grid grid-3"><article class="card"><h3>Casos de uso</h3><p>VPN corporativa entre sucursales; transporte IP y móvil; interconexión de servicios Ethernet.</p></article><article class="card"><h3>Tendencias</h3><p>Segment Routing, EVPN, automatización de provisión y telemetría operacional.</p></article><article class="card"><h3>Ideas clave</h3><p>La etiqueta guía el forwarding; el plano de control crea servicios; la operación aporta resiliencia y seguridad.</p></article></div>
+          <div class="quote">Etiqueta = forwarding.<br>Control = servicio.<br>Operación = resiliencia.</div>
+          <h3 style="margin:20px 0 11px;font-size:18px">Glosario de repaso</h3>
+          <div class="glossary"><div class="term"><strong>FEC</strong><span>Clase equivalente de forwarding</span></div><div class="term"><strong>LSP</strong><span>Camino conmutado por etiquetas</span></div><div class="term"><strong>LSR / LER</strong><span>Router de switching / router de borde</span></div><div class="term"><strong>LFIB</strong><span>Tabla de reenvío MPLS</span></div><div class="term"><strong>VRF</strong><span>Tabla de rutas por servicio</span></div><div class="term"><strong>RD</strong><span>Distingue rutas VPN superpuestas</span></div><div class="term"><strong>RT</strong><span>Política de importación / exportación</span></div><div class="term"><strong>TC</strong><span>Campo de clase de tráfico MPLS</span></div></div>
+          <div class="callout"><span class="callout-mark">?</span><span><strong>Preguntas y discusión:</strong> ¿qué ventaja de MPLS sería más importante para el caso de red que estás diseñando?</span></div>
+        </section>
+        <footer class="slide-controls"><span class="keyboard-hint">Avanza con <kbd>←</kbd> <kbd>→</kbd>, selecciona un título o usa Inicio / Fin.</span><div class="control-group"><button class="control" id="previous" type="button">← <span>Anterior</span></button><button class="control primary" id="next" type="button"><span>Siguiente</span> →</button></div></footer>
+      </div>
+    </main>
+  </div>
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll(".slide")];
+      const topicList = document.getElementById("topic-list");
+      const sectionName = document.getElementById("section-name");
+      const currentNumber = document.getElementById("current-number");
+      const progressValue = document.getElementById("progress-value");
+      const progressBar = document.querySelector('[role="progressbar"]');
+      const previous = document.getElementById("previous");
+      const next = document.getElementById("next");
+      const sidebar = document.getElementById("sidebar");
+      const menuToggle = document.getElementById("menu-toggle");
+      const mobileScrim = document.getElementById("mobile-scrim");
+      let activeIndex = 0;
+      document.getElementById("total-number").textContent = String(slides.length).padStart(2, "0");
+      progressBar.setAttribute("aria-valuemax", String(slides.length));
+      slides.forEach((slide, index) => {
+        const button = document.createElement("button");
+        button.className = "topic";
+        button.type = "button";
+        button.setAttribute("aria-label", `${index + 1}. ${slide.dataset.title}`);
+        button.innerHTML = `<span class="topic-number">${String(index + 1).padStart(2, "0")}</span><span class="topic-name">${slide.dataset.title}</span><span class="topic-check" aria-hidden="true"></span>`;
+        button.addEventListener("click", () => showSlide(index));
+        topicList.append(button);
+      });
+      const topicButtons = [...topicList.querySelectorAll(".topic")];
+      function showSlide(index) {
+        activeIndex = Math.max(0, Math.min(index, slides.length - 1));
+        slides.forEach((slide, i) => {
+          const active = i === activeIndex;
+          slide.classList.toggle("is-active", active);
+          slide.setAttribute("aria-hidden", String(!active));
+        });
+        topicButtons.forEach((button, i) => {
+          button.setAttribute("aria-current", i === activeIndex ? "step" : "false");
+          button.querySelector(".topic-check").textContent = i < activeIndex ? "✓" : i === activeIndex ? "●" : "";
+        });
+        sectionName.textContent = slides[activeIndex].dataset.title;
+        currentNumber.textContent = String(activeIndex + 1).padStart(2, "0");
+        progressValue.style.width = `${((activeIndex + 1) / slides.length) * 100}%`;
+        progressBar.setAttribute("aria-valuenow", String(activeIndex + 1));
+        previous.disabled = activeIndex === 0;
+        next.disabled = activeIndex === slides.length - 1;
+        history.replaceState(null, "", `#tema-${activeIndex + 1}`);
+        closeMenu();
+      }
+      function closeMenu() {
+        sidebar.classList.remove("is-open");
+        mobileScrim.classList.remove("is-open");
+        menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.setAttribute("aria-label", "Abrir menú");
+      }
+      document.addEventListener("click", event => {
+        const button = event.target.closest("[data-info-target]");
+        if (!button) return;
+        const panel = document.getElementById(button.dataset.infoTarget);
+        if (!panel) return;
+        panel.innerHTML = `<strong>${button.dataset.infoTitle}</strong><span>${button.dataset.infoText}</span>`;
+        document.querySelectorAll(`[data-info-target="${button.dataset.infoTarget}"]`).forEach(choice => {
+          choice.setAttribute("aria-pressed", String(choice === button));
+        });
+      });
+      previous.addEventListener("click", () => showSlide(activeIndex - 1));
+      next.addEventListener("click", () => showSlide(activeIndex + 1));
+      menuToggle.addEventListener("click", () => {
+        const open = !sidebar.classList.contains("is-open");
+        sidebar.classList.toggle("is-open", open);
+        mobileScrim.classList.toggle("is-open", open);
+        menuToggle.setAttribute("aria-expanded", String(open));
+        menuToggle.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
+      });
+      mobileScrim.addEventListener("click", closeMenu);
+      document.addEventListener("keydown", event => {
+        if (event.altKey || event.ctrlKey || event.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
+        if (event.key === "ArrowRight" || event.key === "PageDown") { event.preventDefault(); showSlide(activeIndex + 1); }
+        else if (event.key === "ArrowLeft" || event.key === "PageUp") { event.preventDefault(); showSlide(activeIndex - 1); }
+        else if (event.key === "Home") showSlide(0);
+        else if (event.key === "End") showSlide(slides.length - 1);
+        else if (event.key === "Escape") closeMenu();
+      });
+      const requestedSlide = Number(location.hash.match(/^#tema-(\d+)$/)?.[1]);
+      showSlide(Number.isInteger(requestedSlide) && requestedSlide > 0 ? requestedSlide - 1 : 0);
+    })();
+  </script>
+</body>
+</html>
