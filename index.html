@@ -15,16 +15,17 @@
       --white: #fff;
       --line: #dfe7ed;
       --navy: #101c31;
-      --cyan: #27bfc0;
-      --cyan-dark: #087c89;
-      --cyan-pale: #e7f8f7;
-      --blue-pale: #eef2ff;
+      --electric: #2563eb;
+      --cyan: #12b8c4;
+      --cyan-dark: #087f91;
+      --cyan-pale: #e8f8fa;
+      --blue-pale: #edf3ff;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     * { box-sizing: border-box; }
-    body { min-width: 320px; min-height: 100vh; margin: 0; color: var(--ink); background: var(--paper); }
+    body { min-width: 320px; min-height: 100vh; margin: 0; overflow-x: clip; color: var(--ink); background: var(--paper); }
     button { font: inherit; }
-    .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 5; display: flex; width: 315px; flex-direction: column; padding: 22px 16px 16px; color: #eff5fb; background: radial-gradient(circle at 0 0, rgba(39,191,192,.14), transparent 17rem), var(--navy); }
+    .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 5; display: flex; width: 315px; flex-direction: column; padding: 22px 16px 16px; color: #eff5fb; background: var(--navy); }
     .brand { display: flex; align-items: center; gap: 12px; padding: 0 10px 19px; border-bottom: 1px solid #ffffff1a; }
     .brand-mark { display: grid; width: 42px; height: 42px; place-items: center; border: 1px solid #4ed7d47a; border-radius: 12px; color: #69e2df; background: #27bfc01f; font-size: 12px; font-weight: 850; }
     .brand-title { font-size: 17px; font-weight: 750; }
@@ -33,7 +34,7 @@
     .topic-list { display: grid; flex: 1; min-height: 0; gap: 3px; align-content: start; overflow-y: auto; padding-right: 3px; scrollbar-color: #465a70 transparent; scrollbar-width: thin; }
     .topic { display: grid; width: 100%; grid-template-columns: 29px 1fr auto; align-items: center; gap: 7px; padding: 8px 9px; border: 0; border-radius: 8px; color: #bdc9d7; background: transparent; text-align: left; cursor: pointer; }
     .topic:hover { color: #fff; background: #ffffff12; }
-    .topic[aria-current="step"] { color: #fff; background: #27bfc02b; box-shadow: inset 2px 0 #50ded7; }
+    .topic[aria-current="step"] { color: #fff; background: #2563eb33; box-shadow: inset 2px 0 #12b8c4; }
     .topic-number { color: #95a6bb; font-size: 12px; font-variant-numeric: tabular-nums; }
     .topic[aria-current="step"] .topic-number { color: #73e4df; }
     .topic-name { font-size: 15px; font-weight: 620; line-height: 1.3; }
@@ -50,40 +51,36 @@
     .counter strong { color: var(--ink); }
     .progress-track { width: 110px; height: 5px; overflow: hidden; border-radius: 9px; background: #dfe6ec; }
     .progress-value { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--cyan), #65dbb5); transition: width .25s ease; }
-    .stage { display: flex; min-height: calc(100vh - 68px); flex-direction: column; padding: clamp(22px, 4vw, 50px) clamp(22px, 4.5vw, 62px) 24px; }
+    .stage { display: flex; min-height: calc(100vh - 68px); flex-direction: column; padding: clamp(24px, 4vw, 52px) clamp(26px, 4.5vw, 66px) 24px; }
     .slide { display: none; flex: 1; animation: appear .25s ease both; }
     .slide.is-active { display: block; }
     @keyframes appear { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-    .slide-kicker { display: flex; align-items: center; gap: 9px; margin: 0 0 13px; color: var(--cyan-dark); font-size: 15px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .slide-kicker { display: flex; align-items: center; gap: 9px; margin: 0 0 13px; color: var(--electric); font-size: 15px; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
     .slide-kicker::before { width: 22px; height: 2px; border-radius: 3px; background: var(--cyan); content: ""; }
     h1, h2, h3, p { margin-top: 0; }
-    h1, h2 { letter-spacing: -.04em; }
+    h1, h2 { letter-spacing: -.03em; }
     .slide h1 { max-width: 830px; margin-bottom: 17px; font-size: clamp(42px, 5.5vw, 72px); line-height: 1.05; }
     .slide h2 { margin-bottom: 17px; font-size: clamp(38px, 4vw, 56px); line-height: 1.12; }
     .lead { max-width: 1050px; margin-bottom: 28px; color: var(--muted); font-size: clamp(21px, 1.8vw, 25px); line-height: 1.55; }
     .accent { color: var(--cyan-dark); }
     .muted { color: var(--muted); }
-    .cover { position: relative; display: grid; min-height: 600px; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 24px; overflow: hidden; padding: clamp(27px, 4.5vw, 58px); border: 1px solid #e1eeee; border-radius: 24px; background: radial-gradient(circle at 83% 17%, #27bfc021, transparent 20rem), linear-gradient(135deg, #fff, #f0fbfa); box-shadow: 0 22px 60px #14284314; }
+    .cover { position: relative; display: grid; min-height: 560px; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 24px; overflow: hidden; padding: clamp(27px, 4.5vw, 58px); border: 1px solid var(--line); border-top: 4px solid var(--electric); border-radius: 16px; background: #fff; }
     .cover .slide-kicker { margin-bottom: 20px; }
     .cover .lead { max-width: 600px; margin-bottom: 25px; }
-    .cover-meta { display: flex; flex-wrap: wrap; gap: 9px; }
-    .pill { padding: 9px 13px; border: 1px solid #dce8eb; border-radius: 99px; color: #43536a; background: #ffffffd9; font-size: 15px; font-weight: 650; }
     .cover-art { display: grid; min-height: 350px; place-items: center; }
     .network-art { width: min(100%, 390px); }
     .grid { display: grid; gap: 15px; }
     .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .card { padding: 21px; border: 1px solid var(--line); border-radius: 15px; background: var(--white); box-shadow: 0 6px 24px #182b4308; }
+    .card { padding: 21px; border: 1px solid var(--line); border-radius: 12px; background: var(--white); }
     .card h3 { margin-bottom: 11px; font-size: 23px; letter-spacing: -.015em; }
     .card p { margin-bottom: 0; color: var(--muted); font-size: 19px; line-height: 1.6; }
     .card-icon { display: grid; width: 40px; height: 40px; margin-bottom: 14px; place-items: center; border-radius: 11px; color: var(--cyan-dark); background: var(--cyan-pale); font-size: 13px; font-weight: 800; }
-    .callout { display: flex; align-items: flex-start; gap: 13px; margin-top: 19px; padding: 19px 21px; border: 1px solid #c9eeeb; border-radius: 13px; color: #275760; background: #effbfa; font-size: 19px; line-height: 1.6; }
+    .callout { display: flex; align-items: flex-start; gap: 13px; margin-top: 19px; padding: 16px 19px; border: 1px solid #cce8ec; border-left: 3px solid var(--cyan); border-radius: 10px; color: #275760; background: #f2fafb; font-size: 19px; line-height: 1.55; }
     .callout strong { color: #126e77; }
     .callout-mark { flex: none; color: var(--cyan-dark); font-weight: 900; }
-    .speaker-cue { display: block; margin-top: 20px; padding: 19px 22px; border: 1px solid #d7e4ed; border-left: 4px solid var(--cyan); border-radius: 13px; background: #fff; }
-    .speaker-cue strong { display: block; margin-bottom: 7px; color: #17243b; font-size: 21px; }
-    .speaker-cue p { margin: 0; color: #40546b; font-size: 19px; line-height: 1.6; }
+    .speaker-cue { display: none; }
     .compare { display: grid; gap: 6px; padding: 20px; border: 1px solid var(--line); border-radius: 15px; background: #fff; }
     .compare.highlight { border-color: #c4e8e6; background: linear-gradient(145deg, #f2fbfa, #fff); }
     .compare h3 { margin: 0 0 5px; color: var(--cyan-dark); font-size: 21px; }
@@ -99,13 +96,15 @@
     .bit strong { display: block; margin-bottom: 6px; font-size: 18px; }
     .bit small { color: var(--muted); font-size: 16px; line-height: 1.45; }
     .flow { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 19px 0; padding: 20px 12px; border: 1px solid var(--line); border-radius: 15px; background: linear-gradient(120deg, #fff, #f3fbfa); }
-    .flow-node { display: grid; min-width: 95px; min-height: 68px; place-items: center; padding: 9px; border: 1px solid #dfe8ed; border-radius: 11px; background: #fff; text-align: center; }
+    .flow-node { display: grid; min-width: 95px; min-height: 68px; place-items: center; padding: 9px; border: 1px solid #dfe8ed; border-radius: 11px; background: #fff; text-align: center; transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
     .flow-node strong { font-size: 17px; }
     .flow-node small { margin-top: 4px; color: var(--muted); font-size: 15px; line-height: 1.4; }
     .flow-node.edge { border-color: #bce9e5; background: #effafa; }
+    .flow-node.is-current { transform: translateY(-2px); border-color: var(--electric); box-shadow: 0 0 0 3px #2563eb20; }
     .flow-arrow { color: #398e91; font-size: 25px; }
-    .diagram-frame { margin: 18px 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 15px; background: linear-gradient(120deg, #fff, #f6fbfc); }
-    .diagram-frame svg { display: block; width: 100%; height: auto; }
+    .diagram-frame { margin: 18px 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+    .diagram-frame svg { display: block; width: 100%; height: auto; font-family: inherit; }
+    .network-art { font-family: inherit; }
     .diagram-frame figcaption { padding: 12px 18px; border-top: 1px solid var(--line); color: var(--muted); background: #fff; font-size: 16px; line-height: 1.5; }
     .stack { display: grid; max-width: 740px; gap: 8px; margin: 0 auto 17px; }
     .stack-row { display: grid; grid-template-columns: 115px 1fr auto; align-items: center; gap: 12px; padding: 13px 16px; border: 1px solid #e2eaf0; border-radius: 10px; background: #fff; font-size: 18px; }
@@ -150,16 +149,32 @@
     kbd { padding: 3px 7px; border: 1px solid #d9e0e7; border-radius: 5px; color: #586980; background: white; font: inherit; }
     .control-group { display: flex; gap: 8px; }
     .control { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 8px; padding: 0 18px; border: 1px solid #dce4eb; border-radius: 10px; color: #34445a; background: #fff; font-size: 17px; font-weight: 700; cursor: pointer; }
-    .control.primary { border-color: var(--navy); color: #fff; background: var(--navy); }
+    .control.primary { border-color: var(--electric); color: #fff; background: var(--electric); }
+    .control[aria-pressed="true"] { border-color: var(--cyan); color: #075e6d; background: var(--cyan-pale); }
     .control:disabled { opacity: .45; cursor: not-allowed; }
+    .speaker-guide { position: fixed; right: 32px; bottom: 88px; z-index: 6; width: min(780px, calc(100vw - 380px)); max-height: min(36vh, 340px); overflow-y: auto; padding: 20px 22px; border: 1px solid #ccdde7; border-left: 4px solid var(--electric); border-radius: 12px; background: #fff; box-shadow: 0 18px 45px #10243b26; }
+    .speaker-guide[hidden] { display: none; }
+    .speaker-guide-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+    .speaker-guide h2 { margin: 0; color: var(--ink); font-size: 21px; letter-spacing: -.02em; }
+    .guide-close { padding: 5px 9px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); background: #fff; font: inherit; font-size: 14px; cursor: pointer; }
+    .speaker-guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 22px; }
+    .speaker-guide-grid p { margin: 0; color: var(--muted); font-size: 17px; line-height: 1.55; }
+    .speaker-guide-grid strong { display: block; margin-bottom: 4px; color: var(--electric); font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }
+    .presentation-status { min-height: 1.4em; margin: 8px 0 0; color: #9f3434; font-size: 14px; }
+    .app.is-presenting .sidebar, .app.is-presenting .topbar { display: none; }
+    .app.is-presenting .main { margin-left: 0; }
+    .app.is-presenting .stage { min-height: 100vh; padding: 5vh 7vw; }
+    .app.is-presenting .slide { display: none; }
+    .app.is-presenting .slide.is-active { display: grid; align-content: center; }
     .mobile-scrim { display: none; }
     @media (max-width: 1080px) {
       .sidebar { width: 285px; }
       .main { margin-left: 285px; }
       .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .cover { grid-template-columns: 1fr .8fr; }
+      .flow { flex-wrap: wrap; }
     }
-    @media (max-width: 760px) {
+    @media (max-width: 1024px) {
       .sidebar { width: min(310px, 86vw); transform: translateX(-102%); transition: transform .23s ease; }
       .sidebar.is-open { transform: translateX(0); }
       .mobile-scrim.is-open { position: fixed; inset: 0; z-index: 4; display: block; background: #0a14246b; }
@@ -170,16 +185,19 @@
       .eyebrow { overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
       .progress-track { width: 66px; }
       .stage { min-height: calc(100vh - 60px); padding: 23px 17px 17px; }
+      .flow { flex-wrap: wrap; }
       .cover { min-height: 0; grid-template-columns: 1fr; gap: 4px; padding: 29px 22px 18px; }
       .cover-art { min-height: 230px; }
       .network-art { max-width: 300px; }
       .grid-2, .grid-3, .split { grid-template-columns: 1fr; }
       .slide h2 { font-size: clamp(34px, 8vw, 44px); }
       .lead { font-size: 20px; }
-      .card p, .callout, .speaker-cue p { font-size: 18px; }
+      .card p, .callout { font-size: 18px; }
       .card h3 { font-size: 21px; }
       .timeline { grid-template-columns: repeat(2, 1fr); }
       .glossary { grid-template-columns: repeat(2, 1fr); }
+      .speaker-guide-grid { grid-template-columns: 1fr; gap: 10px; }
+      .speaker-guide { right: 16px; bottom: 82px; width: calc(100vw - 32px); max-height: 52vh; }
     }
     @media (max-width: 480px) {
       .grid-4 { grid-template-columns: 1fr; }
@@ -198,6 +216,15 @@
       .timeline { grid-template-columns: 1fr 1fr; }
       th, td { padding: 10px; }
       .compare-row { font-size: 16px; }
+      .control { min-height: 44px; padding: 0 12px; font-size: 15px; }
+      .slide-controls { align-items: flex-start; }
+      .control-group { width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); display: grid; gap: 7px; }
+      .control { width: 100%; padding: 0 8px; }
+      .speaker-guide { padding: 17px; }
+      .speaker-guide-grid p { font-size: 16px; }
+    }
+    @media (max-width: 1024px) {
+      .app.is-presenting .stage { padding: 24px 18px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
@@ -232,8 +259,8 @@
                 <path d="M54 165 C105 165 96 85 157 85 S213 245 272 245 S300 165 343 165" fill="none" stroke="#d8e7eb" stroke-width="13" stroke-linecap="round"/>
                 <path d="M54 165 C105 165 96 85 157 85 S213 245 272 245 S300 165 343 165" fill="none" stroke="url(#route)" stroke-width="4" stroke-dasharray="8 7" stroke-linecap="round"/>
                 <g fill="#fff" stroke="#c9dadd" stroke-width="2"><circle cx="54" cy="165" r="24"/><circle cx="157" cy="85" r="24"/><circle cx="216" cy="177" r="24"/><circle cx="272" cy="245" r="24"/><circle cx="343" cy="165" r="24"/></g>
-                <g fill="#087c89" font-family="system-ui" font-size="11" font-weight="700" text-anchor="middle"><text x="54" y="169">PE</text><text x="157" y="89">P</text><text x="216" y="181">P</text><text x="272" y="249">P</text><text x="343" y="169">PE</text></g>
-                <g fill="#687d91" font-family="system-ui" font-size="9" text-anchor="middle"><text x="54" y="205">INGRESO</text><text x="157" y="46">NÚCLEO</text><text x="216" y="218">NÚCLEO</text><text x="272" y="286">NÚCLEO</text><text x="343" y="205">EGRESO</text></g>
+                <g fill="#087c89" font-family="inherit" font-size="11" font-weight="700" text-anchor="middle"><text x="54" y="169">PE</text><text x="157" y="89">P</text><text x="216" y="181">P</text><text x="272" y="249">P</text><text x="343" y="169">PE</text></g>
+                <g fill="#687d91" font-family="inherit" font-size="9" text-anchor="middle"><text x="54" y="205">INGRESO</text><text x="157" y="46">NÚCLEO</text><text x="216" y="218">NÚCLEO</text><text x="272" y="286">NÚCLEO</text><text x="343" y="205">EGRESO</text></g>
               </svg>
             </div>
           </div>
@@ -330,7 +357,7 @@
           <p class="slide-kicker">09 · Paso a paso</p><h2 id="slide-title-9">Recorrido de un paquete: sucursal → sede</h2>
           <p class="lead">Sigamos un paquete IP entre dos sucursales en una L3VPN. Pulsa cada equipo: verás la etiqueta exterior de transporte cambiar en el núcleo y la etiqueta interior de servicio identificar la VPN al llegar al PE remoto.</p>
           <div class="flow"><div class="flow-node"><strong>1 · CE</strong><small>paquete IP</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>2 · PE ingreso</strong><small>PUSH transporte 240<br>+ servicio 32</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>3 · P1</strong><small>SWAP 240→77<br>conserva 32</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>4 · P2</strong><small>SWAP 77→24<br>conserva 32</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>5 · PE egreso</strong><small>usa servicio 32<br>entrega a la VRF</small></div></div>
-          <div class="interactive"><div class="choice-row"><button class="choice" data-info-target="packet-info" data-info-title="1 · El CE envía el paquete" data-info-text="El router del cliente envía un paquete IP normal. No necesita conocer las etiquetas MPLS del núcleo del proveedor.">CE</button><button class="choice" data-info-target="packet-info" data-info-title="2 · El PE de ingreso clasifica" data-info-text="El PE identifica la interfaz y la VRF del cliente. Añade la etiqueta de servicio y una etiqueta exterior de transporte que apunta al PE remoto.">PE de ingreso</button><button class="choice" data-info-target="packet-info" data-info-title="3–4 · Los routers P conmutan" data-info-text="Cada P consulta la etiqueta exterior en su LFIB y la cambia según el siguiente salto. La etiqueta de servicio interior se conserva; el P no necesita conocer la ruta privada del cliente.">Routers P</button><button class="choice" data-info-target="packet-info" data-info-title="5 · El PE de egreso entrega" data-info-text="El PE remoto recibe el paquete, identifica la etiqueta de servicio (o la recibe tras PHP), selecciona la VRF correcta y reenvía el paquete IP hacia el CE destino.">PE de egreso</button></div><div class="walk-panel" id="packet-info" aria-live="polite"><strong>Selecciona un punto del camino</strong><span>La etiqueta exterior guía el transporte; la interior conserva la identidad del servicio VPN.</span></div></div>
+          <div class="interactive"><div class="choice-row"><button class="choice" data-info-target="packet-info" data-info-title="1 · El CE envía el paquete" data-info-text="El router del cliente envía un paquete IP normal. No necesita conocer las etiquetas MPLS del núcleo del proveedor." data-walk-nodes="0">CE</button><button class="choice" data-info-target="packet-info" data-info-title="2 · El PE de ingreso clasifica" data-info-text="El PE identifica la interfaz y la VRF del cliente. Añade la etiqueta de servicio y una etiqueta exterior de transporte que apunta al PE remoto." data-walk-nodes="1">PE de ingreso</button><button class="choice" data-info-target="packet-info" data-info-title="3–4 · Los routers P conmutan" data-info-text="Cada P consulta la etiqueta exterior en su LFIB y la cambia según el siguiente salto. La etiqueta de servicio interior se conserva; el P no necesita conocer la ruta privada del cliente." data-walk-nodes="2,3">Routers P</button><button class="choice" data-info-target="packet-info" data-info-title="5 · El PE de egreso entrega" data-info-text="El PE remoto recibe el paquete, identifica la etiqueta de servicio (o la recibe tras PHP), selecciona la VRF correcta y reenvía el paquete IP hacia el CE destino." data-walk-nodes="4">PE de egreso</button></div><div class="walk-panel" id="packet-info" aria-live="polite"><strong>Selecciona un punto del camino</strong><span>La etiqueta exterior guía el transporte; la interior conserva la identidad del servicio VPN.</span></div></div>
           <div class="callout"><span class="callout-mark">↗</span><span><strong>Nota:</strong> el dibujo muestra el caso conceptual de dos etiquetas. Con PHP, el penúltimo router puede retirar la exterior antes del PE de egreso; la etiqueta de servicio se conserva.</span></div>
           <aside class="speaker-cue"><strong>Cuenta el viaje en dos capas</strong><p>El PE pone dos etiquetas: la de afuera guía el viaje y la de adentro identifica la VPN. Los P solo cambian la de afuera. Al llegar al PE remoto, se usa la de servicio para entregar el paquete al cliente correcto.</p></aside>
         </section>
@@ -593,7 +620,17 @@
           <div class="callout"><span class="callout-mark">?</span><span><strong>Preguntas y discusión:</strong> ¿qué ventaja de MPLS sería más importante para el caso de red que estás diseñando?</span></div>
           <aside class="speaker-cue"><strong>Cierra volviendo a la pregunta inicial</strong><p>MPLS permite transportar y separar servicios en una red compartida usando etiquetas. La idea más importante es distinguir el transporte, el servicio y las políticas de operación; ahora podemos explicar cada parte siguiendo el recorrido de un paquete.</p></aside>
         </section>
-        <footer class="slide-controls"><span class="keyboard-hint">Avanza con <kbd>←</kbd> <kbd>→</kbd>, selecciona un título o usa Inicio / Fin.</span><div class="control-group"><button class="control" id="previous" type="button">← <span>Anterior</span></button><button class="control primary" id="next" type="button"><span>Siguiente</span> →</button></div></footer>
+        <footer class="slide-controls"><span class="keyboard-hint">Avanza con <kbd>←</kbd> <kbd>→</kbd>, selecciona un título o usa Inicio / Fin.</span><div class="control-group"><button class="control" id="guide-toggle" type="button" aria-controls="speaker-guide" aria-expanded="false">Guía del expositor</button><button class="control" id="presentation-toggle" type="button" aria-pressed="false">Pantalla completa</button><button class="control" id="previous" type="button">← <span>Anterior</span></button><button class="control primary" id="next" type="button"><span>Siguiente</span> →</button></div></footer>
+        <aside class="speaker-guide" id="speaker-guide" aria-labelledby="guide-title" aria-live="polite" hidden>
+          <div class="speaker-guide-heading"><h2 id="guide-title">Guía del expositor</h2><button class="guide-close" id="guide-close" type="button">Cerrar</button></div>
+          <div class="speaker-guide-grid">
+            <p><strong>Explícalo así</strong><span id="guide-explanation"></span></p>
+            <p><strong>Recuerda mencionar</strong><span id="guide-key-point"></span></p>
+            <p><strong>Señala</strong><span id="guide-visual"></span></p>
+            <p><strong>Transición</strong><span id="guide-transition"></span></p>
+          </div>
+        </aside>
+        <p class="presentation-status" id="presentation-status" role="status" aria-live="polite"></p>
       </div>
     </main>
   </div>
@@ -607,6 +644,16 @@
       const progressBar = document.querySelector('[role="progressbar"]');
       const previous = document.getElementById("previous");
       const next = document.getElementById("next");
+      const guideToggle = document.getElementById("guide-toggle");
+      const guideClose = document.getElementById("guide-close");
+      const speakerGuide = document.getElementById("speaker-guide");
+      const guideExplanation = document.getElementById("guide-explanation");
+      const guideKeyPoint = document.getElementById("guide-key-point");
+      const guideVisual = document.getElementById("guide-visual");
+      const guideTransition = document.getElementById("guide-transition");
+      const presentationToggle = document.getElementById("presentation-toggle");
+      const presentationStatus = document.getElementById("presentation-status");
+      const app = document.querySelector(".app");
       const sidebar = document.getElementById("sidebar");
       const menuToggle = document.getElementById("menu-toggle");
       const mobileScrim = document.getElementById("mobile-scrim");
@@ -623,8 +670,53 @@
         topicList.append(button);
       });
       const topicButtons = [...topicList.querySelectorAll(".topic")];
+      function getVisualPrompt(slide) {
+        const options = [
+          [".diagram-frame", "Diagrama"],
+          [".cover-art", "Topología"],
+          [".flow", "Recorrido"],
+          [".stack", "Pila"],
+          [".bits", "Campos"],
+          [".three-steps", "Secuencia"],
+          [".table-wrap", "Tabla"],
+          [".timeline", "Línea de tiempo"],
+          [".interactive", "Interacción"],
+          [".split", "Comparación"],
+          [".grid", "Conceptos"]
+        ];
+        for (const [selector, label] of options) {
+          const visual = slide.querySelector(selector);
+          if (!visual) continue;
+          const caption = visual.querySelector("figcaption");
+          if (caption) return `${label}: ${caption.textContent.trim()}`;
+          const labels = [...visual.querySelectorAll(".flow-node strong, .stack-row strong, .bit strong, .step b, .timeline-item b, .card h3, .compare h3, th")]
+            .map(item => item.textContent.trim())
+            .filter(Boolean)
+            .slice(0, 4);
+          if (labels.length) return `${label}: ${labels.join(" → ")}`;
+        }
+        return slide.querySelector(".lead")?.textContent.trim() || slide.dataset.title;
+      }
+      function updateSpeakerGuide() {
+        const slide = slides[activeIndex];
+        const cue = slide.querySelector(".speaker-cue");
+        guideExplanation.textContent = cue?.querySelector("p")?.textContent.trim()
+          || slide.querySelector(".lead")?.textContent.trim()
+          || slide.dataset.title;
+        guideKeyPoint.textContent = cue?.querySelector("strong")?.textContent.trim()
+          || slide.dataset.title;
+        guideVisual.textContent = getVisualPrompt(slide);
+        const nextTitle = slides[activeIndex + 1]?.dataset.title;
+        guideTransition.textContent = nextTitle
+          ? `Al terminar, enlaza con «${nextTitle}».`
+          : "Cierra conectando las ideas principales de la exposición.";
+      }
       function showSlide(index) {
         activeIndex = Math.max(0, Math.min(index, slides.length - 1));
+        window.scrollTo(0, 0);
+        speakerGuide.hidden = true;
+        guideToggle.setAttribute("aria-expanded", "false");
+        guideToggle.setAttribute("aria-pressed", "false");
         slides.forEach((slide, i) => {
           const active = i === activeIndex;
           slide.classList.toggle("is-active", active);
@@ -638,6 +730,7 @@
         currentNumber.textContent = String(activeIndex + 1).padStart(2, "0");
         progressValue.style.width = `${((activeIndex + 1) / slides.length) * 100}%`;
         progressBar.setAttribute("aria-valuenow", String(activeIndex + 1));
+        updateSpeakerGuide();
         previous.disabled = activeIndex === 0;
         next.disabled = activeIndex === slides.length - 1;
         history.replaceState(null, "", `#tema-${activeIndex + 1}`);
@@ -658,6 +751,12 @@
         document.querySelectorAll(`[data-info-target="${button.dataset.infoTarget}"]`).forEach(choice => {
           choice.setAttribute("aria-pressed", String(choice === button));
         });
+        if (button.dataset.walkNodes) {
+          const activeNodes = new Set(button.dataset.walkNodes.split(","));
+          button.closest(".slide").querySelectorAll(".flow-node").forEach((node, index) => {
+            node.classList.toggle("is-current", activeNodes.has(String(index)));
+          });
+        }
       });
       previous.addEventListener("click", () => showSlide(activeIndex - 1));
       next.addEventListener("click", () => showSlide(activeIndex + 1));
@@ -669,13 +768,46 @@
         menuToggle.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
       });
       mobileScrim.addEventListener("click", closeMenu);
+      guideToggle.addEventListener("click", () => {
+        const open = speakerGuide.hidden;
+        speakerGuide.hidden = !open;
+        guideToggle.setAttribute("aria-expanded", String(open));
+        guideToggle.setAttribute("aria-pressed", String(open));
+      });
+      guideClose.addEventListener("click", () => {
+        speakerGuide.hidden = true;
+        guideToggle.setAttribute("aria-expanded", "false");
+        guideToggle.setAttribute("aria-pressed", "false");
+        guideToggle.focus();
+      });
+      document.addEventListener("fullscreenchange", () => {
+        const presenting = Boolean(document.fullscreenElement);
+        app.classList.toggle("is-presenting", presenting);
+        presentationToggle.setAttribute("aria-pressed", String(presenting));
+        presentationToggle.textContent = presenting ? "Salir de presentación" : "Pantalla completa";
+        if (presenting) presentationStatus.textContent = "";
+      });
+      function reportPresentationError(error) {
+        presentationStatus.textContent = "No se pudo cambiar el modo de pantalla completa. Puedes continuar usando la navegación normal.";
+        console.error("No se pudo cambiar el modo de pantalla completa.", error);
+      }
+      presentationToggle.addEventListener("click", () => {
+        const action = document.fullscreenElement
+          ? document.exitFullscreen()
+          : document.documentElement.requestFullscreen();
+        void action.catch(reportPresentationError);
+      });
       document.addEventListener("keydown", event => {
         if (event.altKey || event.ctrlKey || event.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
         if (event.key === "ArrowRight" || event.key === "PageDown") { event.preventDefault(); showSlide(activeIndex + 1); }
         else if (event.key === "ArrowLeft" || event.key === "PageUp") { event.preventDefault(); showSlide(activeIndex - 1); }
         else if (event.key === "Home") showSlide(0);
         else if (event.key === "End") showSlide(slides.length - 1);
-        else if (event.key === "Escape") closeMenu();
+        else if (event.key === "Escape") {
+          if (!speakerGuide.hidden) guideClose.click();
+          else if (document.fullscreenElement) void document.exitFullscreen().catch(reportPresentationError);
+          else closeMenu();
+        }
       });
       const requestedSlide = Number(location.hash.match(/^#tema-(\d+)$/)?.[1]);
       showSlide(Number.isInteger(requestedSlide) && requestedSlide > 0 ? requestedSlide - 1 : 0);
