@@ -364,6 +364,45 @@
     .comparison-svg .compare-router text { fill: #172b4d; }
     .comparison-svg .compare-router.active circle { fill: #dff4f5; stroke: #0891b2; }
     .mobile-scrim.is-open { background: #172b4d66; }
+    .packet-flow { position: relative; }
+    .flow-packet { position: absolute; z-index: 2; width: 12px; height: 12px; border: 2px solid #ffffff; border-radius: 50%; background: #0891b2; box-shadow: 0 0 0 3px #0891b226; opacity: 0; pointer-events: none; transform: translate(-50%, -50%); }
+    .flow-node.is-packet-active { border-color: #0891b2; box-shadow: 0 0 0 3px #0891b21f; }
+    .diagram-packet circle { fill: #0891b2; stroke: #ffffff; stroke-width: 3; }
+    .diagram-packet.signal circle, .diagram-packet.reverse circle { fill: #765db2; }
+    .diagram-packet.voice circle { fill: #c47b22; }
+    .diagram-packet text { fill: #ffffff; font: 800 12px Inter, system-ui, sans-serif; text-anchor: middle; dominant-baseline: central; }
+    .route-active-link { fill: none; stroke: #0891b2; stroke-width: 11; stroke-linecap: round; stroke-dasharray: 0 9999; pointer-events: none; opacity: .78; }
+    .osi-stack .stack-row.transport { animation: osi-insert 1.5s ease both; }
+    .osi-stack .stack-row:nth-child(1) { animation: osi-layer 1.5s ease both; animation-delay: .65s; }
+    .bits .bit { animation: field-emphasis .75s ease both; }
+    .bits .bit:nth-child(2) { animation-delay: .2s; }
+    .bits .bit:nth-child(3) { animation-delay: .4s; }
+    .bits .bit:nth-child(4) { animation-delay: .6s; }
+    .concept-flow .flow-node { animation: concept-route .65s ease both; }
+    .concept-flow .flow-node:nth-of-type(1) { animation-delay: .15s; }
+    .concept-flow .flow-node:nth-of-type(2) { animation-delay: .45s; }
+    .concept-flow .flow-node:nth-of-type(3) { animation-delay: .75s; }
+    .concept-flow .flow-node:nth-of-type(4) { animation-delay: 1.05s; }
+    .table-wrap tbody tr { animation: row-emphasis .7s ease both; }
+    .table-wrap tbody tr:nth-child(2) { animation-delay: .15s; }
+    .table-wrap tbody tr:nth-child(3) { animation-delay: .3s; }
+    .table-wrap tbody tr:nth-child(4) { animation-delay: .45s; }
+    .table-wrap tbody tr:nth-child(5) { animation-delay: .6s; }
+    .operation-sequence-controls { display: flex; gap: 6px; }
+    .bits-scroll { max-width: 100%; margin: 18px 0; overflow-x: auto; }
+    .bits { grid-template-columns: minmax(0, 20fr) minmax(0, 3fr) minmax(0, 1fr) minmax(0, 8fr); min-width: 900px; gap: 3px; margin: 0 0 8px; }
+    .bits .bit { min-width: 0; min-height: 55px; padding: 10px 2px; text-align: center; }
+    .bits .bit strong { font-size: clamp(11px, 1.25vw, 17px); }
+    .bits-descriptions { display: grid; min-width: 900px; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; color: var(--muted); font-size: 15px; line-height: 1.4; text-align: center; }
+    .bits-descriptions span { padding: 4px 7px; border-radius: 6px; background: #edf3fa; }
+    @keyframes osi-insert { 0% { transform: translateY(-12px); opacity: .25; } 55% { transform: translateY(0); opacity: 1; box-shadow: 0 0 0 4px #0891b226; } 100% { box-shadow: none; } }
+    @keyframes osi-layer { 0%, 100% { background-color: #f1f5fa; } 45% { background-color: #e2f6f7; } }
+    @keyframes field-emphasis { 0%, 100% { box-shadow: 0 0 0 0 #0891b200; } 45% { box-shadow: 0 0 0 4px #0891b226; } }
+    @keyframes concept-route { 0%, 100% { box-shadow: 0 0 0 0 #0891b200; } 55% { border-color: #0891b2; box-shadow: 0 0 0 4px #0891b226; } }
+    @keyframes row-emphasis { 0%, 100% { background-color: transparent; } 45% { background-color: #e2f6f7; } }
+    @media (prefers-reduced-motion: reduce) {
+      .osi-stack .stack-row, .bits .bit, .concept-flow .flow-node, .table-wrap tbody tr { animation: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -421,8 +460,7 @@
             <article class="compare highlight"><h3>Reenvío MPLS</h3><div class="compare-row"><span>Consulta en el core</span><strong>Etiqueta superior</strong></div><div class="compare-row"><span>Siguiente salto</span><strong>Lo indica la LFIB</strong></div><div class="compare-row"><span>Servicio</span><strong>VPN, TE y clases de tráfico</strong></div><div class="compare-row"><span>Uso común</span><strong>Transporte de operador</strong></div></article>
           </div>
           <figure class="comparison-visual" aria-labelledby="comparison-caption">
-            <svg class="comparison-svg" viewBox="0 0 1100 250" role="img" aria-labelledby="comparison-title comparison-desc">
-              <title id="comparison-title">Comparación del reenvío IP y MPLS salto a salto</title>
+            <svg class="comparison-svg" viewBox="0 0 1100 250" role="img" aria-label="Comparación del reenvío IP y MPLS salto a salto" aria-describedby="comparison-desc">
               <desc id="comparison-desc">Dos paquetes atraviesan routers. La ruta IP consulta la dirección de destino en la tabla IP; la ruta MPLS consulta la etiqueta superior mediante la LFIB.</desc>
               <text class="compare-heading" x="30" y="34">REENVÍO IP · CONSULTA LA DIRECCIÓN DE DESTINO EN CADA SALTO</text>
               <path class="compare-link ip-link" d="M190 91 H910"/>
@@ -454,7 +492,7 @@
           <p class="lead">MPLS (Multiprotocol Label Switching) reenvía paquetes usando etiquetas cortas asociadas a una clase de equivalencia de forwarding (FEC). Estandarizado por IETF, integra transporte, control de tráfico y servicios VPN.</p>
           <div class="split">
             <article class="card"><h3>¿Qué significa “capa 2.5”?</h3><p>Es una forma informal de explicar que la cabecera MPLS se inserta entre la cabecera de enlace (por ejemplo, Ethernet) y el paquete de red (por ejemplo, IP). No es una capa OSI formal ni reemplaza las capas existentes.</p></article>
-            <div class="stack"><div class="stack-row"><strong>7–4</strong><span>Aplicación y transporte</span></div><div class="stack-row"><strong>3 · Red</strong><span>IP</span></div><div class="stack-row transport"><strong>2.5</strong><span>MPLS · etiquetas</span></div><div class="stack-row"><strong>2</strong><span>Enlace · Ethernet / PPP</span></div><div class="stack-row"><strong>1</strong><span>Física</span></div></div>
+            <div class="stack osi-stack"><div class="stack-row"><strong>7–4</strong><span>Aplicación y transporte</span></div><div class="stack-row"><strong>3 · Red</strong><span>IP</span></div><div class="stack-row transport"><strong>2.5</strong><span>MPLS · etiquetas</span></div><div class="stack-row"><strong>2</strong><span>Enlace · Ethernet / PPP</span></div><div class="stack-row"><strong>1</strong><span>Física</span></div></div>
           </div>
           <details><summary>¿Por qué surgió MPLS?</summary><p>Las redes de operador necesitaban combinar la eficiencia del switching, el encaminamiento IP y mecanismos para construir VPN y controlar el uso de enlaces. MPLS unificó esas funciones bajo un plano de etiquetas.</p></details>
           <aside class="speaker-cue"><strong>Ubica la etiqueta en el paquete</strong><p>La etiqueta se inserta entre la cabecera de enlace y el paquete de red. Por eso se habla informalmente de “capa 2.5”; no significa que MPLS sea una capa oficial del modelo OSI.</p></aside>
@@ -468,14 +506,19 @@
             <article class="card"><div class="card-icon">LSR</div><h3>Label Switching Router</h3><p>Router MPLS que consulta una etiqueta entrante y aplica una acción: reemplazarla o retirarla.</p></article>
             <article class="card"><div class="card-icon">LER</div><h3>Label Edge Router</h3><p>Router de borde que clasifica el tráfico al ingresar y termina el tratamiento MPLS al egresar. En VPN se denomina habitualmente PE.</p></article>
           </div>
-          <div class="flow"><div class="flow-node edge"><strong>LER / PE</strong><small>clasifica y añade</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>LSR / P</strong><small>conmuta</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>LSR / P</strong><small>conmuta</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>LER / PE</strong><small>retira etiqueta</small></div></div>
+          <div class="flow concept-flow packet-flow"><div class="flow-node edge"><strong>LER / PE</strong><small>clasifica y añade</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>LSR / P</strong><small>conmuta</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>LSR / P</strong><small>conmuta</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>LER / PE</strong><small>retira etiqueta</small></div></div>
           <aside class="speaker-cue"><strong>Usa la secuencia: grupo, camino, routers</strong><p>La FEC agrupa paquetes que reciben un tratamiento común; el LSP es el camino que siguen; los LSR conmutan etiquetas y el router de borde clasifica o entrega el tráfico.</p></aside>
         </section>
         <section class="slide" data-title="Cabecera MPLS: 32 bits que gobiernan el salto" aria-labelledby="slide-title-6">
           <p class="slide-kicker">06 · Formato</p><h2 id="slide-title-6">Cabecera MPLS: 32 bits que gobiernan el salto</h2>
           <p class="lead">Cada etiqueta ocupa 4 bytes (32 bits). La etiqueta indica la acción local; los otros campos ayudan a transportar la clase de servicio y a controlar la pila y los saltos.</p>
-          <div class="bits" aria-label="Campos de la cabecera MPLS de 32 bits">
-            <div class="bit"><strong>LABEL · 20 bits</strong><small>Identifica el tratamiento local</small></div><div class="bit"><strong>TC · 3</strong><small>Clase de tráfico</small></div><div class="bit"><strong>S · 1</strong><small>Fin de pila</small></div><div class="bit"><strong>TTL · 8</strong><small>Límite de saltos</small></div>
+          <div class="bits-scroll">
+            <div class="bits" role="img" aria-label="Cabecera MPLS de 32 bits: LABEL 20 bits, TC 3 bits, S 1 bit y TTL 8 bits">
+              <div class="bit"><strong>LABEL · 20 bits</strong></div><div class="bit"><strong>TC · 3</strong></div><div class="bit"><strong>S · 1</strong></div><div class="bit"><strong>TTL · 8 bits</strong></div>
+            </div>
+            <div class="bits-descriptions" aria-label="Función de cada campo">
+              <span>Identifica el tratamiento local</span><span>Clase de tráfico</span><span>Fin de pila</span><span>Límite de saltos</span>
+            </div>
           </div>
           <div class="interactive"><h3>Explora los campos</h3><div class="choice-row"><button class="choice" data-info-target="header-info" data-info-title="Label · 20 bits" data-info-text="Es el valor que consulta el siguiente router en su LFIB. Las etiquetas tienen significado local al enlace o al salto; no son identificadores globales del servicio.">Label</button><button class="choice" data-info-target="header-info" data-info-title="TC · 3 bits" data-info-text="Traffic Class sirve para transportar información de clase de servicio. La política de QoS se aplica con colas, scheduling, policing y descarte en los equipos.">TC</button><button class="choice" data-info-target="header-info" data-info-title="S · 1 bit" data-info-text="El bit Bottom of Stack marca si esta es la última etiqueta de la pila: S=1 indica que no hay otra etiqueta MPLS debajo.">S</button><button class="choice" data-info-target="header-info" data-info-title="TTL · 8 bits" data-info-text="Se decrementa al avanzar para limitar bucles, de forma análoga al TTL de IP. El tratamiento del TTL también afecta a la visibilidad de traceroute.">TTL</button></div><div class="walk-panel" id="header-info" aria-live="polite"><strong>Elige un campo</strong><span>Los 32 bits juntos controlan el tratamiento MPLS de este salto.</span></div></div>
           <div class="callout"><span class="callout-mark">i</span><span><strong>Rango de etiquetas:</strong> aunque el campo LABEL tiene 20 bits, los valores de 0 a 15 están reservados para usos especiales. Las etiquetas ordinarias se asignan localmente; no son números globales para toda la red.</span></div>
@@ -486,8 +529,7 @@
           <p class="lead">Un paquete puede llevar varias etiquetas. La exterior suele llevarlo por el transporte; la interior puede indicar el servicio o la VPN en el PE de destino.</p>
           <div class="stack"><div class="stack-row transport"><strong>Exterior</strong><span>Transporte · LSP hacia el PE destino</span><small>Label 240</small></div><div class="stack-row"><strong>Interior</strong><span>Servicio · contexto VPN / forwarding</span><small>Label 32</small></div><div class="stack-row"><strong>Payload</strong><span>Paquete original del cliente</span><small>IP</small></div></div>
           <figure class="diagram-frame">
-            <svg viewBox="0 0 1000 240" role="img" aria-labelledby="stack-diagram-title stack-diagram-desc">
-              <title id="stack-diagram-title">Capas de una pila de etiquetas MPLS</title>
+            <svg viewBox="0 0 1000 240" role="img" aria-label="Capas de una pila de etiquetas MPLS" aria-describedby="stack-diagram-desc">
               <desc id="stack-diagram-desc">La etiqueta de transporte va encima de la etiqueta de servicio, que va encima del paquete IP original.</desc>
               <text x="50" y="38" fill="#52647a" font-size="20" font-weight="700">ORDEN DE LA PILA · ARRIBA = PRIMERA ETIQUETA QUE SE CONSULTA</text>
               <rect x="55" y="55" width="890" height="48" rx="10" fill="#e7f8f7" stroke="#7acdc7" stroke-width="2"/>
@@ -511,6 +553,12 @@
               <button class="operation-button" id="operation-pop" type="button" aria-label="Aplicar POP" title="POP"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14M12 4v8m-4-4 4 4 4-4M7 15v5h10v-5"/></svg></button>
               <button class="operation-button" id="operation-reset" type="button" aria-label="Reiniciar pila" title="Reiniciar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"/><path d="M3 3v5h5"/></svg></button>
             </div>
+            <div class="operation-sequence-controls" role="group" aria-label="Secuencia animada PUSH, SWAP y POP">
+              <button class="operation-button" id="operation-sequence-play" type="button" aria-label="Reproducir secuencia" aria-pressed="false" title="Reproducir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 12 7-12 7z"/></svg></button>
+              <button class="operation-button" id="operation-sequence-pause" type="button" aria-label="Pausar secuencia" aria-pressed="true" title="Pausar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg></button>
+              <button class="operation-button" id="operation-sequence-step" type="button" aria-label="Avanzar operación" title="Avanzar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14l11-7zM19 5v14"/></svg></button>
+              <button class="operation-button" id="operation-sequence-reset" type="button" aria-label="Reiniciar secuencia" title="Reiniciar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.64-6.36L3 8"/><path d="M3 3v5h5"/></svg></button>
+            </div>
             <div class="operation-packet" id="operation-packet" aria-label="Pila MPLS actual">
               <span class="operation-token">Transporte 240</span><span class="operation-token service">Servicio 32</span><span class="operation-token payload">Paquete IP</span>
             </div>
@@ -521,7 +569,7 @@
         <section class="slide" data-title="Arquitectura del dominio MPLS" aria-labelledby="slide-title-8">
           <p class="slide-kicker">08 · Topología</p><h2 id="slide-title-8">Arquitectura del dominio MPLS</h2>
           <p class="lead">Los equipos de borde conectan las redes del cliente con el proveedor. Los routers P forman el núcleo de transporte.</p>
-          <div class="flow"><div class="flow-node"><strong>CE</strong><small>equipo del cliente</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>PE ingreso</strong><small>VRF y clasificación</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>P</strong><small>núcleo MPLS</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>P</strong><small>núcleo MPLS</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>PE egreso</strong><small>servicio destino</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>CE</strong><small>sede remota</small></div></div>
+          <div class="flow packet-flow"><div class="flow-node"><strong>CE</strong><small>equipo del cliente</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>PE ingreso</strong><small>VRF y clasificación</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>P</strong><small>núcleo MPLS</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>P</strong><small>núcleo MPLS</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>PE egreso</strong><small>servicio destino</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>CE</strong><small>sede remota</small></div></div>
           <div class="grid grid-3"><article class="card"><h3>CE · Customer Edge</h3><p>Equipo del cliente. Intercambia rutas IP o Ethernet con el PE; no necesita ser consciente de MPLS.</p></article><article class="card"><h3>PE · Provider Edge</h3><p>Borde del operador. Mantiene servicios como VRF y participa en el control de las VPN.</p></article><article class="card"><h3>P · Provider</h3><p>Router del núcleo. Conmuta etiquetas de transporte y no necesita conocer las rutas privadas de los clientes.</p></article></div>
           <div class="callout"><span class="callout-mark">i</span><span><strong>Separación de funciones:</strong> el CE normalmente intercambia tráfico IP o Ethernet con el proveedor; el PE conoce los servicios y las rutas de cliente; los P solo necesitan el transporte del núcleo.</span></div>
           <aside class="speaker-cue"><strong>Asigna un trabajo a cada sigla</strong><p>El CE es el lado del cliente. El PE es la puerta del servicio. Los P forman el camino interno del proveedor. En general, las rutas privadas se mantienen en los PE, no en todos los routers P.</p></aside>
@@ -530,8 +578,7 @@
           <p class="slide-kicker">09 · Paso a paso</p><h2 id="slide-title-9">Recorrido de un paquete: sucursal → sede</h2>
           <p class="lead">Sigamos un paquete IP entre dos sucursales en una L3VPN. Observa cómo cambia la etiqueta exterior de transporte en el núcleo mientras la etiqueta interior identifica la VPN al llegar al PE remoto.</p>
           <figure class="route-figure" aria-labelledby="route-caption">
-            <svg class="route-svg" viewBox="0 0 1100 320" role="img" aria-labelledby="mpls-route-title mpls-route-desc">
-              <title id="mpls-route-title">Paquete MPLS recorriendo una VPN entre dos sucursales</title>
+            <svg class="route-svg" viewBox="0 0 1100 320" role="img" aria-label="Paquete MPLS recorriendo una VPN entre dos sucursales" aria-describedby="mpls-route-desc">
               <desc id="mpls-route-desc">Un paquete viaja desde el router CE de la sucursal A, entra al proveedor por un PE, atraviesa dos routers P, sale por otro PE y llega al CE de la sucursal B. Las etiquetas se actualizan paso a paso.</desc>
               <rect class="site" x="16" y="42" width="174" height="226" rx="18"/>
               <rect class="provider" x="205" y="42" width="690" height="226" rx="18"/>
@@ -540,6 +587,7 @@
               <text class="zone-label" x="226" y="68">RED DEL PROVEEDOR · DOMINIO MPLS</text>
               <text class="zone-label" x="928" y="68">SUCURSAL B</text>
               <path class="link" d="M105 170 C160 170 210 170 280 170 S405 112 470 112 S575 170 640 170 S750 170 815 170 S930 170 990 170"/>
+              <path id="route-active-link" class="route-active-link" d="M105 170 C160 170 210 170 280 170 S405 112 470 112 S575 170 640 170 S750 170 815 170 S930 170 990 170"/>
               <g class="route-router" data-route-node="0" transform="translate(105 170)">
                 <rect class="router-shell" x="-37" y="-31" width="74" height="62" rx="17"/>
                 <path class="router-glyph" d="M-17 0h34m0 0-8-8m8 8-8 8M17-14v28m0 0 8-8m-8 8-8-8"/>
@@ -597,8 +645,7 @@
           <p class="lead">Separarlos ayuda a entender por qué una red puede aprender rutas correctamente pero aun así no reenviar un paquete, o viceversa.</p>
           <div class="grid grid-2"><article class="card"><div class="card-icon">CONTROL</div><h3>Aprende y prepara instrucciones</h3><p>El IGP aprende la topología; LDP o RSVP-TE pueden establecer transporte; MP-BGP anuncia rutas VPN. RIB guarda rutas IP aprendidas y LIB, información de etiquetas disponible.</p></article><article class="card"><div class="card-icon">DATOS</div><h3>Aplica las instrucciones al paquete</h3><p>FIB contiene decisiones IP instaladas; LFIB indica etiqueta entrante → acción → salida. Un ASIC puede ejecutar esas acciones en hardware.</p></article></div>
           <figure class="diagram-frame">
-            <svg viewBox="0 0 1000 300" role="img" aria-labelledby="planes-diagram-title planes-diagram-desc">
-              <title id="planes-diagram-title">Relación entre plano de control y plano de datos</title>
+            <svg viewBox="0 0 1000 300" role="img" aria-label="Relación entre plano de control y plano de datos" aria-describedby="planes-diagram-desc">
               <desc id="planes-diagram-desc">Los protocolos generan información de rutas y etiquetas. El router instala decisiones en FIB y LFIB y las aplica a cada paquete.</desc>
               <rect x="30" y="25" width="940" height="108" rx="15" fill="#eef2ff"/>
               <text x="55" y="62" fill="#394c83" font-size="22" font-weight="800">PLANO DE CONTROL · APRENDE Y CALCULA</text>
@@ -610,14 +657,16 @@
               <text x="617" y="104" fill="#17243b" font-size="20" text-anchor="middle">MP-BGP · VPN</text>
               <rect x="740" y="78" width="205" height="38" rx="9" fill="#fff" stroke="#c9d2f2" stroke-width="2"/>
               <text x="842" y="104" fill="#17243b" font-size="20" text-anchor="middle">RIB / LIB</text>
-              <path d="M500 137 V166" stroke="#398e91" stroke-width="4"/>
+              <path id="control-program-path" d="M500 137 V166" stroke="#398e91" stroke-width="4"/>
+              <g class="diagram-packet signal" data-motion-path="control-program-path" data-motion-duration="1500"><circle r="8"/><text y="1">C</text></g>
               <path d="M488 157 L500 171 L512 157" fill="#398e91"/>
               <text x="520" y="158" fill="#52647a" font-size="17">programa</text>
               <rect x="30" y="178" width="940" height="97" rx="15" fill="#effafa"/>
               <text x="55" y="214" fill="#087c89" font-size="22" font-weight="800">PLANO DE DATOS · REENVÍA CADA PAQUETE</text>
               <rect x="95" y="228" width="270" height="34" rx="8" fill="#fff" stroke="#bce9e5" stroke-width="2"/>
               <text x="230" y="252" fill="#17243b" font-size="20" text-anchor="middle">FIB / LFIB · decisión</text>
-              <path d="M382 245 H510" stroke="#398e91" stroke-width="4"/>
+              <path id="data-forward-path" d="M382 245 H510" stroke="#398e91" stroke-width="4"/>
+              <g class="diagram-packet" data-motion-path="data-forward-path" data-motion-duration="1200"><circle r="8"/><text y="1">P</text></g>
               <path d="M500 233 L516 245 L500 257" fill="none" stroke="#398e91" stroke-width="4"/>
               <rect x="535" y="228" width="330" height="34" rx="8" fill="#fff" stroke="#bce9e5" stroke-width="2"/>
               <text x="700" y="252" fill="#17243b" font-size="20" text-anchor="middle">ASIC aplica · push / swap / pop</text>
@@ -632,8 +681,7 @@
           <p class="lead">LDP permite que los routers intercambien etiquetas asociadas a destinos. En el caso habitual, la FEC corresponde a un prefijo aprendido por el IGP y cada router anuncia la etiqueta que sus vecinos usarán para llegar hasta él.</p>
           <div class="three-steps"><div class="step"><b>1 · Descubrir</b><span>Mensajes Hello sobre UDP identifican vecinos LDP en enlaces habilitados.</span></div><div class="step"><b>2 · Establecer sesión</b><span>Los routers abren una sesión TCP, normalmente en el puerto 646.</span></div><div class="step"><b>3 · Anunciar etiquetas</b><span>Label Mapping relaciona una FEC con una etiqueta; cada vecino programa su LFIB.</span></div></div>
           <figure class="diagram-frame">
-            <svg viewBox="0 0 1000 255" role="img" aria-labelledby="ldp-diagram-title ldp-diagram-desc">
-              <title id="ldp-diagram-title">Intercambio de mensajes entre vecinos LDP</title>
+            <svg viewBox="0 0 1000 255" role="img" aria-label="Intercambio de mensajes entre vecinos LDP" aria-describedby="ldp-diagram-desc">
               <desc id="ldp-diagram-desc">Dos routers se descubren con Hello por UDP, establecen una sesión TCP y después intercambian asociaciones de etiquetas.</desc>
               <rect x="75" y="82" width="200" height="100" rx="16" fill="#effafa" stroke="#79c9c4" stroke-width="3"/>
               <text x="175" y="126" fill="#087c89" font-size="25" font-weight="800" text-anchor="middle">LSR A</text>
@@ -641,13 +689,16 @@
               <rect x="725" y="82" width="200" height="100" rx="16" fill="#effafa" stroke="#79c9c4" stroke-width="3"/>
               <text x="825" y="126" fill="#087c89" font-size="25" font-weight="800" text-anchor="middle">LSR B</text>
               <text x="825" y="156" fill="#52647a" font-size="19" text-anchor="middle">vecino MPLS</text>
-              <path d="M290 93 H710" stroke="#398e91" stroke-width="4"/>
+              <path id="ldp-hello-forward" d="M290 93 H710" stroke="#398e91" stroke-width="4"/>
+              <g class="diagram-packet signal" data-motion-path="ldp-hello-forward" data-motion-duration="1900"><circle r="8"/><text y="1">H</text></g>
               <path d="M698 81 L714 93 L698 105" fill="none" stroke="#398e91" stroke-width="4"/>
               <text x="500" y="78" fill="#17243b" font-size="20" font-weight="700" text-anchor="middle">Hello · UDP/646 · descubrimiento</text>
-              <path d="M710 125 H290" stroke="#7888a0" stroke-width="3"/>
+              <path id="ldp-hello-return" d="M710 125 H290" stroke="#7888a0" stroke-width="3"/>
+              <g class="diagram-packet signal" data-motion-path="ldp-hello-return" data-motion-duration="2100"><circle r="7"/><text y="1">H</text></g>
               <path d="M302 113 L286 125 L302 137" fill="none" stroke="#7888a0" stroke-width="3"/>
               <text x="500" y="120" fill="#52647a" font-size="18" text-anchor="middle">Hello en ambos sentidos</text>
-              <path d="M290 164 H710" stroke="#087c89" stroke-width="4"/>
+              <path id="ldp-session-path" d="M290 164 H710" stroke="#087c89" stroke-width="4"/>
+              <g class="diagram-packet" data-motion-path="ldp-session-path" data-motion-duration="1600"><circle r="8"/><text y="1">L</text></g>
               <path d="M698 152 L714 164 L698 176" fill="none" stroke="#087c89" stroke-width="4"/>
               <text x="500" y="158" fill="#17243b" font-size="19" font-weight="700" text-anchor="middle">Sesión TCP/646 · intercambio confiable</text>
               <rect x="275" y="205" width="450" height="38" rx="9" fill="#eef2ff"/>
@@ -655,7 +706,7 @@
             </svg>
             <figcaption>LDP no transporta los paquetes de usuario: coordina entre routers las etiquetas que luego usarán las tablas de forwarding.</figcaption>
           </figure>
-          <div class="flow"><div class="flow-node edge"><strong>LSR A</strong><small>usa label 22</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>LSR B</strong><small>usa label 40<br>hacia C</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>LSR C</strong><small>anuncia FEC<br>10.0.0.0/8</small></div></div>
+          <div class="flow packet-flow"><div class="flow-node edge"><strong>LSR A</strong><small>usa label 22</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>LSR B</strong><small>usa label 40<br>hacia C</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>LSR C</strong><small>anuncia FEC<br>10.0.0.0/8</small></div></div>
           <div class="callout"><span class="callout-mark">i</span><span><strong>Las etiquetas son locales:</strong> un router anuncia a su vecino qué etiqueta usar para alcanzar una FEC. Los valores pueden ser distintos en cada tramo; lo importante es que cada LFIB coincida con la etiqueta anunciada por el siguiente salto.</span></div>
           <details><summary>¿Qué revisar si no se instala el LSP?</summary><p>Alcance IP del router-id, vecinos y sesión LDP, sincronización con IGP cuando se use, etiqueta anunciada por el siguiente salto y entrada resultante en la LFIB.</p></details>
           <aside class="speaker-cue"><strong>Explícalo como una cadena de instrucciones locales</strong><p>C anuncia una etiqueta para llegar a su destino. B aprende esa etiqueta y anuncia otra hacia A. Cada router sigue la indicación de su siguiente salto; no existe un único número de etiqueta para todo el trayecto.</p></aside>
@@ -664,13 +715,15 @@
           <p class="slide-kicker">12 · Ingeniería de tráfico</p><h2 id="slide-title-12">RSVP-TE: caminos explícitos con restricciones</h2>
           <p class="lead">RSVP-TE permite establecer un LSP que siga un trayecto compatible con requisitos de red, en vez de limitarse siempre al camino más corto del IGP.</p>
           <figure class="diagram-frame">
-            <svg viewBox="0 0 1000 330" role="img" aria-labelledby="te-diagram-title te-diagram-desc">
-              <title id="te-diagram-title">Comparación de camino más corto y camino RSVP-TE viable</title>
+            <svg viewBox="0 0 1000 330" role="img" aria-label="Comparación de camino más corto y camino RSVP-TE viable" aria-describedby="te-diagram-desc">
               <desc id="te-diagram-desc">El camino directo está congestionado; RSVP-TE elige una ruta alternativa con ancho de banda disponible.</desc>
               <text x="45" y="42" fill="#52647a" font-size="19" font-weight="700">MISMO ORIGEN Y DESTINO · DIFERENTE CAMINO SEGÚN LAS RESTRICCIONES</text>
-              <path d="M110 165 L350 125 L650 125 L890 165" fill="none" stroke="#d27676" stroke-width="8" stroke-dasharray="15 10"/>
+              <path id="te-short-path" d="M110 165 L350 125 L650 125 L890 165" fill="none" stroke="#d27676" stroke-width="8" stroke-dasharray="15 10"/>
               <text x="500" y="78" fill="#9c3e45" font-size="20" font-weight="800" text-anchor="middle">IGP: camino más corto · no hay 1 Gb/s</text>
-              <path d="M110 165 L350 235 L650 235 L890 165" fill="none" stroke="#27a8a5" stroke-width="9"/>
+              <path id="te-selected-path" d="M110 165 L350 235 L650 235 L890 165" fill="none" stroke="#27a8a5" stroke-width="9"/>
+              <g class="diagram-packet signal" data-motion-path="te-selected-path" data-motion-duration="3100"><circle r="9"/><text y="1">P</text></g>
+              <g class="diagram-packet signal reverse" data-motion-path="te-selected-path" data-motion-duration="3100" data-motion-offset=".45"><circle r="9"/><text y="1">R</text></g>
+              <g class="diagram-packet" data-motion-path="te-selected-path" data-motion-duration="2400" data-motion-offset=".75"><circle r="10"/><text y="1">T</text></g>
               <text x="500" y="285" fill="#087c89" font-size="20" font-weight="800" text-anchor="middle">RSVP-TE: camino factible · 1,2 Gb/s disponibles</text>
               <g fill="#fff" stroke="#41546b" stroke-width="4">
                 <circle cx="110" cy="165" r="34"/><circle cx="350" cy="125" r="31"/><circle cx="650" cy="125" r="31"/>
@@ -695,13 +748,14 @@
           <div class="grid grid-3"><article class="card"><div class="card-icon">VRF</div><h3>Tabla por servicio</h3><p>Guarda rutas y decisiones de forwarding de un cliente o dominio independiente.</p></article><article class="card"><div class="card-icon">RD</div><h3>Route Distinguisher</h3><p>Hace única una ruta VPN cuando distintos clientes usan el mismo prefijo IPv4/IPv6.</p></article><article class="card"><div class="card-icon">RT</div><h3>Route Target</h3><p>Atributo BGP que controla qué rutas se exportan e importan en cada VRF.</p></article></div>
           <div class="flow"><div class="flow-node edge"><strong>VRF ACME</strong><small>RD 65000:10</small></div><span class="flow-arrow">↔</span><div class="flow-node"><strong>MP-BGP</strong><small>VPNv4 / VPNv6</small></div><span class="flow-arrow">↔</span><div class="flow-node edge"><strong>VRF ACME</strong><small>import RT 65000:100</small></div></div>
           <figure class="diagram-frame">
-            <svg viewBox="0 0 1000 315" role="img" aria-labelledby="vpn-diagram-title vpn-diagram-desc">
-              <title id="vpn-diagram-title">Dos VPN de cliente separadas sobre el mismo núcleo MPLS</title>
+            <svg viewBox="0 0 1000 315" role="img" aria-label="Dos VPN de cliente separadas sobre el mismo núcleo MPLS" aria-describedby="vpn-diagram-desc">
               <desc id="vpn-diagram-desc">Las rutas con el mismo prefijo de dos clientes permanecen en VRF distintas y viajan separadas mediante etiquetas y políticas.</desc>
               <rect x="300" y="24" width="400" height="265" rx="22" fill="#f5f8fb" stroke="#dfe7ed" stroke-width="2"/>
               <text x="500" y="51" fill="#52647a" font-size="19" font-weight="800" text-anchor="middle">NÚCLEO DEL PROVEEDOR</text>
-              <path d="M110 155 H890" stroke="#27a8a5" stroke-width="7"/>
-              <path d="M110 240 H890" stroke="#8173bd" stroke-width="7"/>
+              <path id="vpn-blue-path" d="M110 155 H890" stroke="#27a8a5" stroke-width="7"/>
+              <g class="diagram-packet" data-motion-path="vpn-blue-path" data-motion-duration="3600"><circle r="9"/><text y="1">A</text></g>
+              <path id="vpn-violet-path" d="M110 240 H890" stroke="#8173bd" stroke-width="7"/>
+              <g class="diagram-packet reverse" data-motion-path="vpn-violet-path" data-motion-duration="4200"><circle r="9"/><text y="1">B</text></g>
               <g fill="#fff" stroke="#41546b" stroke-width="3">
                 <circle cx="110" cy="155" r="31"/><circle cx="350" cy="155" r="28"/><circle cx="500" cy="155" r="28"/><circle cx="650" cy="155" r="28"/><circle cx="890" cy="155" r="31"/>
                 <circle cx="110" cy="240" r="31"/><circle cx="350" cy="240" r="28"/><circle cx="500" cy="240" r="28"/><circle cx="650" cy="240" r="28"/><circle cx="890" cy="240" r="31"/>
@@ -725,7 +779,7 @@
         <section class="slide" data-title="VPN de capa 2: VPWS y VPLS" aria-labelledby="slide-title-14">
           <p class="slide-kicker">14 · Servicios Ethernet</p><h2 id="slide-title-14">VPN de capa 2: VPWS y VPLS</h2>
           <p class="lead">Mientras una L3VPN conecta redes IP mediante rutas, una VPN de capa 2 entrega un servicio Ethernet al cliente.</p>
-          <div class="grid grid-2"><article class="card"><div class="card-icon">P2P</div><h3>VPWS · punto a punto</h3><p>Emula un circuito Ethernet entre dos ubicaciones. Desde el punto de vista del cliente se comporta de forma parecida a un cable virtual.</p><div class="flow"><div class="flow-node"><strong>CE A</strong></div><span class="flow-arrow">↔</span><div class="flow-node edge"><strong>VPWS</strong></div><span class="flow-arrow">↔</span><div class="flow-node"><strong>CE B</strong></div></div></article><article class="card"><div class="card-icon">MP</div><h3>VPLS · multipunto</h3><p>Interconecta varias sedes como una LAN extendida. Los PE aprenden direcciones MAC y replican tráfico BUM (broadcast, unknown unicast y multicast).</p><div class="flow"><div class="flow-node"><strong>CE A</strong></div><span class="flow-arrow">↘</span><div class="flow-node edge"><strong>VPLS</strong></div><span class="flow-arrow">↗</span><div class="flow-node"><strong>CE B / C</strong></div></div></article></div>
+          <div class="grid grid-2"><article class="card"><div class="card-icon">P2P</div><h3>VPWS · punto a punto</h3><p>Emula un circuito Ethernet entre dos ubicaciones. Desde el punto de vista del cliente se comporta de forma parecida a un cable virtual.</p><div class="flow packet-flow"><div class="flow-node"><strong>CE A</strong></div><span class="flow-arrow">↔</span><div class="flow-node edge"><strong>VPWS</strong></div><span class="flow-arrow">↔</span><div class="flow-node"><strong>CE B</strong></div></div></article><article class="card"><div class="card-icon">MP</div><h3>VPLS · multipunto</h3><p>Interconecta varias sedes como una LAN extendida. Los PE aprenden direcciones MAC y replican tráfico BUM (broadcast, unknown unicast y multicast).</p><div class="flow packet-flow"><div class="flow-node"><strong>CE A</strong></div><span class="flow-arrow">↘</span><div class="flow-node edge"><strong>VPLS</strong></div><span class="flow-arrow">↗</span><div class="flow-node"><strong>CE B / C</strong></div></div></article></div>
           <details><summary>Un punto para considerar en operación</summary><p>El dominio de capa 2 amplía el alcance de broadcasts y aprendizaje MAC. Hay que dimensionar la replicación y evitar bucles, movimientos MAC inesperados y dominios excesivamente grandes.</p></details>
           <div class="callout"><span class="callout-mark">↗</span><span><strong>Hoy:</strong> EVPN suele utilizarse como plano de control para servicios Ethernet multipunto modernos. VPLS sigue siendo útil para explicar el concepto, pero su aprendizaje distribuido puede ser menos escalable en redes grandes.</span></div>
           <aside class="speaker-cue"><strong>Compara un cable con una LAN</strong><p>VPWS se parece a un cable virtual entre dos sedes. VPLS conecta varias sedes como una LAN, por eso también debe aprender MAC y manejar broadcasts. Más flexibilidad en capa 2 implica más cuidado con el tamaño y los bucles.</p></aside>
@@ -735,6 +789,24 @@
           <p class="lead">La ingeniería de tráfico permite distribuir carga por la red y elegir caminos que respeten los objetivos del servicio, en vez de asumir que el shortest path siempre es el mejor.</p>
           <div class="grid grid-2"><article class="card"><div class="card-icon">01</div><h3>Restricciones</h3><p>Ancho de banda disponible, métricas, afinidades y grupos de riesgo compartido (SRLG), que identifican enlaces con una falla física común.</p></article><article class="card"><div class="card-icon">02</div><h3>Afinidades</h3><p>Colores administrativos para incluir o excluir enlaces: por ejemplo, evitar un enlace marcado como “satélite” para tráfico sensible a la latencia.</p></article><article class="card"><div class="card-icon">03</div><h3>Prioridad</h3><p>La prioridad de establecimiento y la preempción determinan si un túnel nuevo puede desplazar recursos de uno existente.</p></article><article class="card"><div class="card-icon">04</div><h3>Distribución</h3><p>Diseñar varios túneles y asignarles tráfico puede usar enlaces alternativos. Tener varios caminos no garantiza que el tráfico se reparta automáticamente.</p></article></div>
           <div class="callout"><span class="callout-mark">↗</span><span><strong>Ejemplo:</strong> si el túnel necesita 1 Gb/s y evitar un enlace de riesgo, el cálculo descarta caminos que no cumplan ambos requisitos. La telemetría debe confirmar que la ruta sigue siendo adecuada.</span></div>
+          <figure class="diagram-frame">
+            <svg viewBox="0 0 1000 210" role="img" aria-label="Comparación de una ruta IGP y una ruta de ingeniería de tráfico" aria-describedby="traffic-engineering-desc">
+              <desc id="traffic-engineering-desc">Dos rutas conectan el mismo origen y destino. La ruta alternativa pasa por routers distintos y representa la selección condicionada por ingeniería de tráfico.</desc>
+              <text x="45" y="34" fill="#52647a" font-size="17" font-weight="700">MISMO ORIGEN Y DESTINO · RUTAS DISTINTAS</text>
+              <path id="te-igp-path" d="M100 112 H330 L500 70 L670 112 H900" fill="none" stroke="#9a6670" stroke-width="5" stroke-dasharray="12 9"/>
+              <text x="500" y="61" fill="#8b4a54" font-size="16" font-weight="700" text-anchor="middle">IGP</text>
+              <path id="te-policy-path" d="M100 112 H330 L500 160 L670 112 H900" fill="none" stroke="#27a8a5" stroke-width="7"/>
+              <text x="500" y="193" fill="#087c89" font-size="16" font-weight="700" text-anchor="middle">Ruta seleccionada por TE</text>
+              <g fill="#fff" stroke="#41546b" stroke-width="3">
+                <circle cx="100" cy="112" r="24"/><circle cx="330" cy="112" r="23"/><circle cx="500" cy="70" r="23"/><circle cx="500" cy="160" r="23"/><circle cx="670" cy="112" r="23"/><circle cx="900" cy="112" r="24"/>
+              </g>
+              <g fill="#17243b" font-size="15" font-weight="800" text-anchor="middle">
+                <text x="100" y="117">IN</text><text x="330" y="117">P1</text><text x="500" y="75">P2</text><text x="500" y="165">P3</text><text x="670" y="117">P4</text><text x="900" y="117">OUT</text>
+              </g>
+              <g class="diagram-packet" data-motion-path="te-policy-path" data-motion-duration="3300"><circle r="9"/><text y="1">T</text></g>
+            </svg>
+            <figcaption>La ruta resaltada ilustra una alternativa elegida para cumplir las restricciones configuradas; la ruta IGP se conserva como referencia.</figcaption>
+          </figure>
           <aside class="speaker-cue"><strong>Formula una petición de ruta concreta</strong><p>En vez de decir “elige el camino más corto”, el operador puede pedir: “necesito 1 Gb/s y no quiero pasar por este grupo de enlaces”. MPLS-TE busca un camino que cumpla esas condiciones; luego el diseño debe decidir cómo se asigna el tráfico.</p></aside>
         </section>
         <section class="slide" data-title="Calidad de servicio: TC + DiffServ" aria-labelledby="slide-title-16">
@@ -743,8 +815,7 @@
           <div class="table-wrap"><table><thead><tr><th>Clase ilustrativa</th><th>Tratamiento esperado</th><th>Ejemplo</th></tr></thead><tbody><tr><td><strong>Tiempo real · EF</strong></td><td>Baja latencia; prioridad limitada para no bloquear otras clases</td><td>Voz</td></tr><tr><td><strong>Crítica · AF4x</strong></td><td>Menor probabilidad de descarte y recursos acordados</td><td>Vídeo / control</td></tr><tr><td><strong>Negocio · AF2x</strong></td><td>Ancho de banda definido por política</td><td>Aplicaciones corporativas</td></tr><tr><td><strong>Best effort · BE</strong></td><td>Cola estándar</td><td>Internet general</td></tr></tbody></table></div>
           <div class="three-steps"><div class="step"><b>Clasificar y marcar</b><span>Identificar aplicación y mapear DSCP/TC.</span></div><div class="step"><b>Controlar el ingreso</b><span>Aplicar policing o shaping al tráfico.</span></div><div class="step"><b>Gestionar congestión</b><span>Configurar colas, scheduling y descarte en cada cuello de botella.</span></div></div>
           <figure class="diagram-frame">
-            <svg viewBox="0 0 1000 270" role="img" aria-labelledby="qos-diagram-title qos-diagram-desc">
-              <title id="qos-diagram-title">Clases de tráfico, colas y enlace MPLS</title>
+            <svg viewBox="0 0 1000 270" role="img" aria-label="Clases de tráfico, colas y enlace MPLS" aria-describedby="qos-diagram-desc">
               <desc id="qos-diagram-desc">Voz, aplicaciones y tráfico general se clasifican y esperan en colas con políticas distintas antes de compartir el enlace.</desc>
               <text x="45" y="40" fill="#52647a" font-size="19" font-weight="700">LAS CLASES COMPARTEN EL ENLACE; LAS COLAS DEFINEN CÓMO SE ATIENDE CADA UNA</text>
               <g font-size="19" font-weight="800">
@@ -752,14 +823,22 @@
                 <rect x="45" y="120" width="190" height="38" rx="9" fill="#eef2ff"/><text x="65" y="146" fill="#394c83">APPS · AF</text>
                 <rect x="45" y="170" width="190" height="38" rx="9" fill="#effafa"/><text x="65" y="196" fill="#087c89">RESTO · BE</text>
               </g>
-              <path d="M245 89 H390 M245 139 H390 M245 189 H390" stroke="#8b9aaa" stroke-width="4"/>
+              <path id="qos-ef-path" d="M245 89 H390" stroke="#8b9aaa" stroke-width="4"/>
+              <path id="qos-af-path" d="M245 139 H390" stroke="#8b9aaa" stroke-width="4"/>
+              <path id="qos-be-path" d="M245 189 H390" stroke="#8b9aaa" stroke-width="4"/>
+              <g class="diagram-packet voice" data-motion-path="qos-ef-path" data-motion-duration="1700"><circle r="8"/><text y="1">E</text></g>
+              <g class="diagram-packet signal" data-motion-path="qos-af-path" data-motion-duration="2300"><circle r="8"/><text y="1">A</text></g>
+              <g class="diagram-packet" data-motion-path="qos-be-path" data-motion-duration="2900"><circle r="8"/><text y="1">B</text></g>
               <path d="M378 78 L394 89 L378 100 M378 128 L394 139 L378 150 M378 178 L394 189 L378 200" fill="none" stroke="#8b9aaa" stroke-width="3"/>
               <rect x="410" y="65" width="280" height="155" rx="15" fill="#fff" stroke="#cfdde5" stroke-width="2"/>
               <text x="550" y="93" fill="#17243b" font-size="20" font-weight="800" text-anchor="middle">COLAS + SCHEDULER</text>
               <rect x="440" y="108" width="220" height="27" rx="6" fill="#f7e3c4"/><text x="550" y="128" fill="#68451d" font-size="16" font-weight="700" text-anchor="middle">EF · baja latencia, prioridad limitada</text>
               <rect x="440" y="144" width="220" height="27" rx="6" fill="#e4e9fa"/><text x="550" y="164" fill="#394c83" font-size="16" font-weight="700" text-anchor="middle">AF · recursos y descarte definidos</text>
               <rect x="440" y="180" width="220" height="27" rx="6" fill="#dff4f2"/><text x="550" y="200" fill="#087c89" font-size="16" font-weight="700" text-anchor="middle">BE · servicio estándar</text>
-              <path d="M700 143 H800" stroke="#398e91" stroke-width="5"/>
+              <path id="qos-output-path" d="M700 143 H800" stroke="#398e91" stroke-width="5"/>
+              <g class="diagram-packet voice" data-motion-path="qos-output-path" data-motion-duration="2300"><circle r="8"/><text y="1">E</text></g>
+              <g class="diagram-packet signal" data-motion-path="qos-output-path" data-motion-duration="2300" data-motion-offset=".22"><circle r="8"/><text y="1">A</text></g>
+              <g class="diagram-packet" data-motion-path="qos-output-path" data-motion-duration="2300" data-motion-offset=".44"><circle r="8"/><text y="1">B</text></g>
               <path d="M788 130 L804 143 L788 156" fill="none" stroke="#398e91" stroke-width="4"/>
               <rect x="820" y="100" width="145" height="86" rx="13" fill="#effafa" stroke="#79c9c4" stroke-width="2"/>
               <text x="892" y="136" fill="#087c89" font-size="20" font-weight="800" text-anchor="middle">ENLACE</text>
@@ -774,10 +853,9 @@
           <p class="slide-kicker">17 · Resiliencia</p><h2 id="slide-title-17">Protección y alta disponibilidad</h2>
           <p class="lead">La resiliencia combina detección de fallas, un camino alternativo y reconvergencia. Para cumplir un SLA también hay que probar los tiempos y el comportamiento real ante fallos.</p>
           <div class="timeline"><div class="timeline-item"><b>1 · Detectar</b><p>BFD puede identificar rápidamente que un vecino o enlace dejó de responder.</p></div><div class="timeline-item"><b>2 · Conmutar</b><p>FRR usa una alternativa local para reducir el impacto sin esperar al IGP.</p></div><div class="timeline-item"><b>3 · Reconverger</b><p>IGP o TE calcula el camino estable tras el cambio topológico.</p></div><div class="timeline-item"><b>4 · Verificar</b><p>Medir pérdida, latencia, alarmas y recuperación con pruebas programadas.</p></div></div>
-          <div class="flow"><div class="flow-node"><strong>Camino primario</strong><small>tráfico normal</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>Falla detectada</strong><small>BFD</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>Backup FRR</strong><small>conmutación local</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>IGP / TE</strong><small>reconvergencia</small></div></div>
+          <div class="flow packet-flow"><div class="flow-node"><strong>Camino primario</strong><small>tráfico normal</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>Falla detectada</strong><small>BFD</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>Backup FRR</strong><small>conmutación local</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>IGP / TE</strong><small>reconvergencia</small></div></div>
           <figure class="diagram-frame">
-            <svg viewBox="0 0 1000 295" role="img" aria-labelledby="frr-diagram-title frr-diagram-desc">
-              <title id="frr-diagram-title">Conmutación al camino de respaldo ante una falla</title>
+            <svg viewBox="0 0 1000 295" role="img" aria-label="Conmutación al camino de respaldo ante una falla" aria-describedby="frr-diagram-desc">
               <desc id="frr-diagram-desc">El camino principal pasa por P1 y P2. Cuando falla el enlace, FRR desvía el tráfico por P3 y P4.</desc>
               <text x="50" y="39" fill="#52647a" font-size="19" font-weight="700">ANTES DE LA FALLA: TRÁFICO POR EL CAMINO PRIMARIO</text>
               <path d="M120 108 H340 H565 H790 H900" fill="none" stroke="#27a8a5" stroke-width="8"/>
@@ -787,7 +865,8 @@
               <path d="M666 96 L690 120 M690 96 L666 120" stroke="#b44d52" stroke-width="5"/>
               <text x="678" y="75" fill="#a5444b" font-size="17" font-weight="800" text-anchor="middle">FALLA</text>
               <text x="50" y="180" fill="#52647a" font-size="19" font-weight="700">DESPUÉS DE DETECTARLA: FRR USA EL RESPALDO PREINSTALADO</text>
-              <path d="M120 230 H340 L455 260 L565 230 L790 230 H900" fill="none" stroke="#8173bd" stroke-width="8" stroke-dasharray="14 9"/>
+              <path id="frr-backup-path" d="M120 230 H340 L455 260 L565 230 L790 230 H900" fill="none" stroke="#8173bd" stroke-width="8" stroke-dasharray="14 9"/>
+              <g class="diagram-packet" data-motion-path="frr-backup-path" data-motion-duration="3500"><circle r="10"/><text y="1">F</text></g>
               <g fill="#fff" stroke="#65589c" stroke-width="4"><circle cx="120" cy="230" r="29"/><circle cx="340" cy="230" r="29"/><circle cx="455" cy="260" r="27"/><circle cx="565" cy="230" r="29"/><circle cx="790" cy="230" r="29"/><circle cx="900" cy="230" r="29"/></g>
               <g fill="#39415b" font-size="17" font-weight="800" text-anchor="middle"><text x="120" y="236">IN</text><text x="340" y="236">P1</text><text x="455" y="266">P3</text><text x="565" y="236">P4</text><text x="790" y="236">P5</text><text x="900" y="236">OUT</text></g>
             </svg>
@@ -802,8 +881,7 @@
           <p class="lead">Una VPN MPLS separa rutas de clientes mediante políticas y tablas independientes. Eso no cifra el contenido ni reemplaza la seguridad del plano de control y de gestión.</p>
           <div class="grid grid-2"><article class="card"><h3>Etiqueta no confiable</h3><p>Filtrar MPLS desde puertos de cliente y aceptar etiquetas solo en las interfaces previstas.</p></article><article class="card"><h3>DoS al plano de control</h3><p>Usar CoPP, límites de sesiones y autenticación donde sea compatible y esté configurada.</p></article><article class="card"><h3>Error de RT o VRF</h3><p>Aplicar plantillas, revisión de cambios y validación de rutas importadas/exportadas.</p></article><article class="card"><h3>Confidencialidad</h3><p>Si se requiere cifrado del transporte, evaluar IPsec o MACsec según el punto de protección y el modelo de amenaza.</p></article></div>
           <figure class="diagram-frame">
-            <svg viewBox="0 0 1000 260" role="img" aria-labelledby="security-diagram-title security-diagram-desc">
-              <title id="security-diagram-title">Aislamiento de VPN y cifrado son protecciones diferentes</title>
+            <svg viewBox="0 0 1000 260" role="img" aria-label="Aislamiento de VPN y cifrado son protecciones diferentes" aria-describedby="security-diagram-desc">
               <desc id="security-diagram-desc">Las VRF mantienen rutas de clientes separadas; el cifrado protege la confidencialidad de los datos durante el transporte.</desc>
               <rect x="28" y="28" width="450" height="205" rx="16" fill="#f5f8fb" stroke="#dfe7ed" stroke-width="2"/>
               <text x="253" y="59" fill="#17243b" font-size="21" font-weight="800" text-anchor="middle">AISLAMIENTO · VRF / VPN</text>
@@ -812,8 +890,10 @@
               <rect x="275" y="82" width="165" height="49" rx="10" fill="#eef2ff" stroke="#bfcaf0" stroke-width="2"/>
               <text x="357" y="113" fill="#394c83" font-size="19" font-weight="800" text-anchor="middle">VRF CLIENTE B</text>
               <path d="M75 165 H430 M75 190 H430" stroke="#b6c2cd" stroke-width="3"/>
-              <path d="M75 165 H430" stroke="#27a8a5" stroke-width="5"/>
-              <path d="M75 190 H430" stroke="#8173bd" stroke-width="5"/>
+              <path id="security-vrf-a-path" d="M75 165 H430" stroke="#27a8a5" stroke-width="5"/>
+              <g class="diagram-packet" data-motion-path="security-vrf-a-path" data-motion-duration="3100"><circle r="8"/><text y="1">A</text></g>
+              <path id="security-vrf-b-path" d="M75 190 H430" stroke="#8173bd" stroke-width="5"/>
+              <g class="diagram-packet reverse" data-motion-path="security-vrf-b-path" data-motion-duration="3600"><circle r="8"/><text y="1">B</text></g>
               <text x="253" y="220" fill="#52647a" font-size="17" text-anchor="middle">Rutas separadas · contenido no necesariamente cifrado</text>
               <path d="M500 130 H555" stroke="#8b9aaa" stroke-width="4"/>
               <path d="M543 118 L559 130 L543 142" fill="none" stroke="#8b9aaa" stroke-width="4"/>
@@ -845,6 +925,20 @@
           <p class="lead">MPLS continúa siendo una pieza útil en redes de operador y servicios empresariales. Comprender el camino del paquete ayuda a explicar también el valor y los límites de la tecnología.</p>
           <div class="grid grid-3"><article class="card"><h3>Casos de uso</h3><p>VPN corporativa entre sucursales; transporte de tráfico IP y móvil; servicios Ethernet entre sedes.</p></article><article class="card"><h3>Evolución</h3><p>Segment Routing simplifica la señalización de caminos en el núcleo; EVPN aporta un plano de control escalable para servicios Ethernet.</p></article><article class="card"><h3>Límites y operación</h3><p>MPLS no cifra por sí mismo ni garantiza velocidad o capacidad. Importan el diseño, las políticas, el monitoreo y las pruebas.</p></article></div>
           <div class="quote">Etiqueta = forwarding.<br>Control = servicio.<br>Operación = resiliencia.</div>
+          <figure class="diagram-frame">
+            <svg viewBox="0 0 1000 160" role="img" aria-label="Resumen visual del recorrido de un paquete por el dominio MPLS" aria-describedby="summary-route-desc">
+              <desc id="summary-route-desc">Un paquete entra desde un equipo del cliente, recibe etiquetas en el PE, atraviesa routers del proveedor y sale hacia la sede remota.</desc>
+              <path id="summary-route-path" d="M95 78 H300 L440 48 H580 L720 108 H905" fill="none" stroke="#8ba2bb" stroke-width="7" stroke-linecap="round"/>
+              <g fill="#ffffff" stroke="#8197ae" stroke-width="3">
+                <circle cx="95" cy="78" r="25"/><circle cx="300" cy="78" r="25"/><circle cx="440" cy="48" r="25"/><circle cx="580" cy="48" r="25"/><circle cx="720" cy="108" r="25"/><circle cx="905" cy="108" r="25"/>
+              </g>
+              <g fill="#172b4d" font-size="16" font-weight="800" text-anchor="middle">
+                <text x="95" y="84">CE</text><text x="300" y="84">PE</text><text x="440" y="54">P</text><text x="580" y="54">P</text><text x="720" y="114">PE</text><text x="905" y="114">CE</text>
+              </g>
+              <g class="diagram-packet" data-motion-path="summary-route-path" data-motion-duration="3800"><circle r="10"/><text y="1">M</text></g>
+            </svg>
+            <figcaption>El paquete del cliente entra al proveedor, sigue el transporte MPLS y se entrega en el sitio remoto.</figcaption>
+          </figure>
           <h3 style="margin:20px 0 11px;font-size:18px">Glosario de repaso</h3>
           <div class="glossary"><div class="term"><strong>FEC</strong><span>Clase equivalente de forwarding</span></div><div class="term"><strong>LSP</strong><span>Camino conmutado por etiquetas</span></div><div class="term"><strong>LSR / LER</strong><span>Router de switching / router de borde</span></div><div class="term"><strong>LFIB</strong><span>Tabla de reenvío MPLS</span></div><div class="term"><strong>VRF</strong><span>Tabla de rutas por servicio</span></div><div class="term"><strong>RD</strong><span>Distingue rutas VPN superpuestas</span></div><div class="term"><strong>RT</strong><span>Política de importación / exportación</span></div><div class="term"><strong>TC</strong><span>Campo de clase de tráfico MPLS</span></div></div>
           <details><summary>Fuentes para profundizar (RFC del IETF)</summary><p>Estándares y documentos de referencia: <a href="https://www.rfc-editor.org/rfc/rfc3031" target="_blank" rel="noreferrer">RFC 3031 · arquitectura MPLS</a>, <a href="https://www.rfc-editor.org/rfc/rfc5036" target="_blank" rel="noreferrer">RFC 5036 · LDP</a>, <a href="https://www.rfc-editor.org/rfc/rfc3209" target="_blank" rel="noreferrer">RFC 3209 · RSVP-TE</a>, <a href="https://www.rfc-editor.org/rfc/rfc4364" target="_blank" rel="noreferrer">RFC 4364 · VPN MPLS de capa 3</a> y <a href="https://www.rfc-editor.org/rfc/rfc3270" target="_blank" rel="noreferrer">RFC 3270 · DiffServ con MPLS</a>.</p></details>
@@ -890,6 +984,7 @@
       const mobileScrim = document.getElementById("mobile-scrim");
       const guideKeywords = document.getElementById("guide-keywords");
       const routePath = document.querySelector(".route-svg .link");
+      const routeActiveLink = document.getElementById("route-active-link");
       const routePacket = document.getElementById("route-packet");
       const routeNodes = [...document.querySelectorAll("[data-route-node]")];
       const routeStepTitle = document.getElementById("route-step-title");
@@ -906,6 +1001,10 @@
       const operationSwap = document.getElementById("operation-swap");
       const operationPop = document.getElementById("operation-pop");
       const operationReset = document.getElementById("operation-reset");
+      const operationSequencePlay = document.getElementById("operation-sequence-play");
+      const operationSequencePause = document.getElementById("operation-sequence-pause");
+      const operationSequenceStep = document.getElementById("operation-sequence-step");
+      const operationSequenceReset = document.getElementById("operation-sequence-reset");
       const comparisonIpPath = document.querySelector(".ip-link");
       const comparisonMplsPath = document.querySelector(".mpls-link");
       const comparisonIpPacket = document.getElementById("ip-demo-packet");
@@ -951,6 +1050,18 @@
       let routeTimer = null;
       let routeFrame = 0;
       let routeLengths = [];
+      let routePathLength = 0;
+      let routePositionLength = 0;
+      let graphicFrame = 0;
+      let graphicStartTime = 0;
+      let operationSequenceTimer = null;
+      let operationSequenceIndex = 0;
+      function pauseOperationSequence() {
+        window.clearInterval(operationSequenceTimer);
+        operationSequenceTimer = null;
+        operationSequencePlay.setAttribute("aria-pressed", "false");
+        operationSequencePause.setAttribute("aria-pressed", "true");
+      }
       let comparisonProgress = 0;
       let comparisonFrame = 0;
       let comparisonStartTime = 0;
@@ -964,8 +1075,99 @@
       let operationLabels = startingLabels.map(label => ({ ...label }));
       let nextPushedLabel = 160;
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const graphicMotionTracks = [...document.querySelectorAll("svg [data-motion-path]")].map(marker => {
+        const svg = marker.ownerSVGElement;
+        const path = svg?.querySelector(`#${marker.dataset.motionPath}`);
+        if (!path) throw new Error(`No se encontró la trayectoria SVG: ${marker.dataset.motionPath}`);
+        const length = path.getTotalLength();
+        if (!Number.isFinite(length) || length <= 0) throw new Error(`La trayectoria SVG está vacía: ${marker.dataset.motionPath}`);
+        return {
+          marker,
+          path,
+          length,
+          duration: Number(marker.dataset.motionDuration) || 3000,
+          offset: Number(marker.dataset.motionOffset) || 0,
+          reverse: marker.classList.contains("reverse")
+        };
+      });
+      graphicMotionTracks.forEach(({ marker }) => marker.style.opacity = "0");
+      const packetFlows = [...document.querySelectorAll(".packet-flow")].map(flow => {
+        const nodes = [...flow.children].filter(child => child.classList.contains("flow-node"));
+        const packet = document.createElement("span");
+        packet.className = "flow-packet";
+        packet.setAttribute("aria-hidden", "true");
+        flow.append(packet);
+        return { flow, nodes, packet, duration: Number(flow.dataset.motionDuration) || 3200 };
+      });
+      function stopGraphicAnimations() {
+        window.cancelAnimationFrame(graphicFrame);
+        graphicFrame = 0;
+        graphicStartTime = 0;
+        graphicMotionTracks.forEach(({ marker }) => marker.style.opacity = "0");
+        packetFlows.forEach(({ flow, packet }) => {
+          packet.style.opacity = "0";
+          flow.querySelectorAll(".flow-node").forEach(node => node.classList.remove("is-packet-active"));
+        });
+      }
+      function startGraphicAnimations() {
+        stopGraphicAnimations();
+        if (reducedMotion.matches) return;
+        const activeSlide = slides[activeIndex];
+        const activeTracks = graphicMotionTracks.filter(track => track.marker.closest(".slide") === activeSlide);
+        const activeFlows = packetFlows.filter(track => track.flow.closest(".slide") === activeSlide && track.nodes.length > 1);
+        if (!activeTracks.length && !activeFlows.length) return;
+        activeTracks.forEach(({ marker }) => marker.style.opacity = "1");
+        const animate = timestamp => {
+          if (!graphicStartTime) graphicStartTime = timestamp;
+          const elapsed = timestamp - graphicStartTime;
+          activeTracks.forEach(track => {
+            const cycle = track.duration + 320;
+            let progress = (elapsed + track.offset * track.duration) % cycle / track.duration;
+            if (progress >= 1) {
+              track.marker.style.opacity = "0";
+              return;
+            }
+            track.marker.style.opacity = "1";
+            if (track.reverse) progress = 1 - progress;
+            const point = track.path.getPointAtLength(track.length * progress);
+            track.marker.setAttribute("transform", `translate(${point.x} ${point.y})`);
+          });
+          activeFlows.forEach(({ flow, nodes, packet, duration }) => {
+            const bounds = nodes.map(node => {
+              const rect = node.getBoundingClientRect();
+              return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+            });
+            const firstY = bounds[0].y;
+            if (bounds.some(point => Math.abs(point.y - firstY) > 18)) {
+              packet.style.opacity = "0";
+              nodes.forEach(node => node.classList.remove("is-packet-active"));
+              return;
+            }
+            const flowBounds = flow.getBoundingClientRect();
+            const progress = elapsed % (duration + 320) / duration;
+            if (progress >= 1) {
+              packet.style.opacity = "0";
+              nodes.forEach(node => node.classList.remove("is-packet-active"));
+              return;
+            }
+            const segment = progress * (bounds.length - 1);
+            const from = Math.floor(segment);
+            const fraction = segment - from;
+            const to = Math.min(from + 1, bounds.length - 1);
+            const x = bounds[from].x + (bounds[to].x - bounds[from].x) * fraction - flowBounds.left;
+            const y = bounds[from].y + (bounds[to].y - bounds[from].y) * fraction - flowBounds.top;
+            packet.style.opacity = "1";
+            packet.style.left = `${x}px`;
+            packet.style.top = `${y}px`;
+            nodes.forEach((node, index) => node.classList.toggle("is-packet-active", index === (fraction < .5 ? from : to)));
+          });
+          graphicFrame = window.requestAnimationFrame(animate);
+        };
+        graphicFrame = window.requestAnimationFrame(animate);
+      }
       if (routePath) {
         const totalLength = routePath.getTotalLength();
+        routePathLength = totalLength;
         routeLengths = routeNodes.map(node => {
           const matrix = node.transform.baseVal.consolidate()?.matrix;
           if (!matrix) throw new Error("No se pudo ubicar un router en la topología MPLS.");
@@ -1013,9 +1215,20 @@
           .slice(0, 3)
           .join(" · ");
       }
+      function highlightRouteSegment(start, end) {
+        if (!routeActiveLink || routePathLength <= 0) return;
+        const first = Math.min(start, end);
+        const last = Math.max(start, end);
+        const length = last - first;
+        routeActiveLink.setAttribute("stroke-dasharray", `${length} ${Math.max(routePathLength - length, 0)}`);
+        routeActiveLink.setAttribute("stroke-dashoffset", String(-first));
+      }
       function updateRouteLabels(step) {
+        routePositionLength = routeLengths[step];
         const point = routePath.getPointAtLength(routeLengths[step]);
         routePacket.setAttribute("transform", `translate(${point.x} ${point.y})`);
+        if (step === 0) highlightRouteSegment(0, 0);
+        else highlightRouteSegment(routeLengths[step - 1], routeLengths[step]);
         routeNodes.forEach((node, index) => {
           node.classList.toggle("active-router", index === step);
         });
@@ -1073,14 +1286,17 @@
         };
         comparisonFrame = window.requestAnimationFrame(animate);
       }
-      function moveRoutePacket(from, to) {
+      function moveRoutePacket(to, onComplete) {
         window.cancelAnimationFrame(routeFrame);
-        const startLength = routeLengths[from];
+        const startLength = routePositionLength;
         const endLength = routeLengths[to];
         const duration = reducedMotion.matches ? 0 : 650;
         if (!duration) {
           const point = routePath.getPointAtLength(endLength);
           routePacket.setAttribute("transform", `translate(${point.x} ${point.y})`);
+          routePositionLength = endLength;
+          highlightRouteSegment(startLength, endLength);
+          onComplete();
           return;
         }
         let startedAt = 0;
@@ -1088,46 +1304,59 @@
           if (!startedAt) startedAt = timestamp;
           const progress = Math.min((timestamp - startedAt) / duration, 1);
           const eased = progress * progress * (3 - 2 * progress);
-          const point = routePath.getPointAtLength(startLength + (endLength - startLength) * eased);
+          const currentLength = startLength + (endLength - startLength) * eased;
+          const point = routePath.getPointAtLength(currentLength);
           routePacket.setAttribute("transform", `translate(${point.x} ${point.y})`);
+          routePositionLength = currentLength;
+          highlightRouteSegment(startLength, currentLength);
           if (progress < 1) routeFrame = window.requestAnimationFrame(move);
+          else {
+            routeFrame = 0;
+            onComplete();
+          }
         };
         routeFrame = window.requestAnimationFrame(move);
       }
       function setRouteStep(step) {
         const nextStep = Math.max(0, Math.min(step, routeSteps.length - 1));
-        const previousStep = routeIndex;
-        routeIndex = nextStep;
-        updateRouteLabels(nextStep);
-        moveRoutePacket(previousStep, nextStep);
+        if (nextStep === routeIndex && routePositionLength === routeLengths[nextStep]) return;
+        routeNext.disabled = true;
+        moveRoutePacket(nextStep, () => {
+          routeIndex = nextStep;
+          updateRouteLabels(nextStep);
+        });
       }
       function setRoutePlaying(playing) {
         window.clearInterval(routeTimer);
         routeTimer = null;
         if (!playing) {
           window.cancelAnimationFrame(routeFrame);
-          updateRouteLabels(routeIndex);
-          renderOperationStack();
-          updateComparison(0);
+          routeFrame = 0;
+          routeNext.disabled = routeIndex === routeSteps.length - 1;
         }
         routePlay.setAttribute("aria-pressed", String(playing));
         routePause.setAttribute("aria-pressed", String(!playing));
         if (playing) {
-          if (routeIndex === routeSteps.length - 1) setRouteStep(0);
+          if (routeIndex === routeSteps.length - 1) {
+            routeIndex = 0;
+            updateRouteLabels(0);
+          }
           routeTimer = window.setInterval(() => {
             if (routeIndex >= routeSteps.length - 1) {
               setRoutePlaying(false);
               return;
             }
             setRouteStep(routeIndex + 1);
-            if (routeIndex === routeSteps.length - 1) setRoutePlaying(false);
           }, reducedMotion.matches ? 1800 : 1450);
         }
       }
       updateRouteLabels(routeIndex);
       function showSlide(index) {
         activeIndex = Math.max(0, Math.min(index, slides.length - 1));
+        stopGraphicAnimations();
+        pauseOperationSequence();
         setRoutePlaying(false);
+        updateRouteLabels(routeIndex);
         setComparisonPlaying(false);
         window.scrollTo(0, 0);
         speakerGuide.hidden = true;
@@ -1152,6 +1381,7 @@
         next.disabled = activeIndex === slides.length - 1;
         history.replaceState(null, "", `#tema-${activeIndex + 1}`);
         closeMenu();
+        startGraphicAnimations();
       }
       function closeMenu() {
         sidebar.classList.remove("is-open");
@@ -1188,7 +1418,8 @@
       });
       routeReset.addEventListener("click", () => {
         setRoutePlaying(false);
-        setRouteStep(0);
+        routeIndex = 0;
+        updateRouteLabels(0);
       });
       comparisonPlay.addEventListener("click", () => setComparisonPlaying(true));
       comparisonPause.addEventListener("click", () => setComparisonPlaying(false));
@@ -1219,11 +1450,46 @@
         renderOperationStack();
       });
       operationReset.addEventListener("click", () => {
+        pauseOperationSequence();
+        operationSequenceIndex = 0;
         operationLabels = startingLabels.map(label => ({ ...label }));
         nextPushedLabel = 160;
         operationTitle.textContent = "Pila de partida";
         operationDescription.textContent = "Prueba cómo cambian las etiquetas. Cada acción se aplica sobre la etiqueta que está arriba.";
         renderOperationStack();
+      });
+      function advanceOperationSequence() {
+        if (operationSequenceIndex >= 3) operationReset.click();
+        [operationPush, operationSwap, operationPop][operationSequenceIndex].click();
+        operationSequenceIndex += 1;
+      }
+      operationSequencePlay.addEventListener("click", () => {
+        if (operationSequenceIndex >= 3) operationReset.click();
+        pauseOperationSequence();
+        operationSequencePlay.setAttribute("aria-pressed", "true");
+        advanceOperationSequence();
+        if (operationSequenceIndex < 3) {
+          operationSequenceTimer = window.setInterval(() => {
+            advanceOperationSequence();
+            if (operationSequenceIndex >= 3) pauseOperationSequence();
+          }, reducedMotion.matches ? 1800 : 1350);
+        } else {
+          pauseOperationSequence();
+        }
+      });
+      operationSequencePause.addEventListener("click", pauseOperationSequence);
+      operationSequenceStep.addEventListener("click", () => {
+        pauseOperationSequence();
+        advanceOperationSequence();
+      });
+      operationSequenceReset.addEventListener("click", () => operationReset.click());
+      reducedMotion.addEventListener("change", event => {
+        startGraphicAnimations();
+        if (event.matches) {
+          setRoutePlaying(false);
+          setComparisonPlaying(false);
+          pauseOperationSequence();
+        }
       });
       menuToggle.addEventListener("click", () => {
         const open = !sidebar.classList.contains("is-open");
