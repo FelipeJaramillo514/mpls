@@ -104,6 +104,9 @@
     .flow-node small { margin-top: 4px; color: var(--muted); font-size: 15px; line-height: 1.4; }
     .flow-node.edge { border-color: #bce9e5; background: #effafa; }
     .flow-arrow { color: #398e91; font-size: 25px; }
+    .diagram-frame { margin: 18px 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 15px; background: linear-gradient(120deg, #fff, #f6fbfc); }
+    .diagram-frame svg { display: block; width: 100%; height: auto; }
+    .diagram-frame figcaption { padding: 12px 18px; border-top: 1px solid var(--line); color: var(--muted); background: #fff; font-size: 16px; line-height: 1.5; }
     .stack { display: grid; max-width: 740px; gap: 8px; margin: 0 auto 17px; }
     .stack-row { display: grid; grid-template-columns: 115px 1fr auto; align-items: center; gap: 12px; padding: 13px 16px; border: 1px solid #e2eaf0; border-radius: 10px; background: #fff; font-size: 18px; }
     .stack-row strong { color: var(--cyan-dark); }
@@ -181,6 +184,8 @@
     @media (max-width: 480px) {
       .grid-4 { grid-template-columns: 1fr; }
       .flow { flex-wrap: wrap; gap: 4px; padding: 13px 5px; }
+      .diagram-frame svg { min-width: 720px; }
+      .diagram-frame figcaption { font-size: 15px; }
       .flow-node { min-width: 60px; min-height: 57px; padding: 5px; }
       .flow-node strong { font-size: 13px; }
       .flow-node small { font-size: 12px; }
@@ -293,6 +298,23 @@
           <p class="slide-kicker">07 · Forwarding</p><h2 id="slide-title-7">Pila de etiquetas y operaciones</h2>
           <p class="lead">Un paquete puede llevar varias etiquetas. La exterior suele llevarlo por el transporte; la interior puede indicar el servicio o la VPN en el PE de destino.</p>
           <div class="stack"><div class="stack-row transport"><strong>Exterior</strong><span>Transporte · LSP hacia el PE destino</span><small>Label 240</small></div><div class="stack-row"><strong>Interior</strong><span>Servicio · contexto VPN / forwarding</span><small>Label 32</small></div><div class="stack-row"><strong>Payload</strong><span>Paquete original del cliente</span><small>IP</small></div></div>
+          <figure class="diagram-frame">
+            <svg viewBox="0 0 1000 240" role="img" aria-labelledby="stack-diagram-title stack-diagram-desc">
+              <title id="stack-diagram-title">Capas de una pila de etiquetas MPLS</title>
+              <desc id="stack-diagram-desc">La etiqueta de transporte va encima de la etiqueta de servicio, que va encima del paquete IP original.</desc>
+              <text x="50" y="38" fill="#52647a" font-size="20" font-weight="700">ORDEN DE LA PILA · ARRIBA = PRIMERA ETIQUETA QUE SE CONSULTA</text>
+              <rect x="55" y="55" width="890" height="48" rx="10" fill="#e7f8f7" stroke="#7acdc7" stroke-width="2"/>
+              <text x="82" y="86" fill="#087c89" font-size="23" font-weight="800">1 · TRANSPORTE</text>
+              <text x="390" y="86" fill="#17243b" font-size="22">Label 240 → PE de destino</text>
+              <rect x="55" y="111" width="890" height="48" rx="10" fill="#eef2ff" stroke="#c9d2f2" stroke-width="2"/>
+              <text x="82" y="142" fill="#394c83" font-size="23" font-weight="800">2 · SERVICIO</text>
+              <text x="390" y="142" fill="#17243b" font-size="22">Label 32 → VRF / interfaz de salida</text>
+              <rect x="55" y="167" width="890" height="48" rx="10" fill="#fff" stroke="#dfe7ed" stroke-width="2"/>
+              <text x="82" y="198" fill="#52647a" font-size="23" font-weight="800">3 · CARGA ÚTIL</text>
+              <text x="390" y="198" fill="#17243b" font-size="22">Paquete IP original del cliente</text>
+            </svg>
+            <figcaption>Las etiquetas se apilan delante del paquete. Cada router consulta la etiqueta superior; al quitarla, queda expuesta la siguiente.</figcaption>
+          </figure>
           <div class="three-steps"><div class="step"><b>PUSH</b><span>Añade una etiqueta al ingresar al dominio o al asociar el servicio.</span></div><div class="step"><b>SWAP</b><span>Reemplaza la etiqueta por otra que el vecino anunció.</span></div><div class="step"><b>POP</b><span>Retira una etiqueta al aproximarse al destino o al salir del dominio.</span></div></div>
           <div class="callout"><span class="callout-mark">i</span><span><strong>Penultimate Hop Popping (PHP):</strong> el penúltimo router puede retirar la etiqueta exterior antes de llegar al PE de egreso. La etiqueta interior, si existe, se conserva.</span></div>
           <aside class="speaker-cue"><strong>Apóyate en la pila como un sobre</strong><p>La etiqueta exterior lleva el paquete por el transporte; la interior puede identificar el servicio al llegar. PUSH agrega, SWAP cambia la etiqueta de arriba y POP la retira. PHP permite que el penúltimo router quite la etiqueta exterior.</p></aside>
@@ -317,7 +339,34 @@
           <p class="slide-kicker">10 · Separación funcional</p><h2 id="slide-title-10">Plano de control y plano de datos</h2>
           <p class="lead">Separarlos ayuda a entender por qué una red puede aprender rutas correctamente pero aun así no reenviar un paquete, o viceversa.</p>
           <div class="grid grid-2"><article class="card"><div class="card-icon">CONTROL</div><h3>Aprende y prepara instrucciones</h3><p>El IGP aprende la topología; LDP o RSVP-TE pueden establecer transporte; MP-BGP anuncia rutas VPN. RIB guarda rutas IP aprendidas y LIB, información de etiquetas disponible.</p></article><article class="card"><div class="card-icon">DATOS</div><h3>Aplica las instrucciones al paquete</h3><p>FIB contiene decisiones IP instaladas; LFIB indica etiqueta entrante → acción → salida. Un ASIC puede ejecutar esas acciones en hardware.</p></article></div>
-          <div class="flow"><div class="flow-node"><strong>RIB / LIB</strong><small>información de control</small></div><span class="flow-arrow">↓ programa</span><div class="flow-node edge"><strong>FIB / LFIB</strong><small>decisiones instaladas</small></div><span class="flow-arrow">↓ aplica</span><div class="flow-node"><strong>Paquete</strong><small>push · swap · pop</small></div></div>
+          <figure class="diagram-frame">
+            <svg viewBox="0 0 1000 300" role="img" aria-labelledby="planes-diagram-title planes-diagram-desc">
+              <title id="planes-diagram-title">Relación entre plano de control y plano de datos</title>
+              <desc id="planes-diagram-desc">Los protocolos generan información de rutas y etiquetas. El router instala decisiones en FIB y LFIB y las aplica a cada paquete.</desc>
+              <rect x="30" y="25" width="940" height="108" rx="15" fill="#eef2ff"/>
+              <text x="55" y="62" fill="#394c83" font-size="22" font-weight="800">PLANO DE CONTROL · APRENDE Y CALCULA</text>
+              <rect x="55" y="78" width="200" height="38" rx="9" fill="#fff" stroke="#c9d2f2" stroke-width="2"/>
+              <text x="155" y="104" fill="#17243b" font-size="20" text-anchor="middle">IGP · topología</text>
+              <rect x="275" y="78" width="220" height="38" rx="9" fill="#fff" stroke="#c9d2f2" stroke-width="2"/>
+              <text x="385" y="104" fill="#17243b" font-size="20" text-anchor="middle">LDP / RSVP-TE</text>
+              <rect x="515" y="78" width="205" height="38" rx="9" fill="#fff" stroke="#c9d2f2" stroke-width="2"/>
+              <text x="617" y="104" fill="#17243b" font-size="20" text-anchor="middle">MP-BGP · VPN</text>
+              <rect x="740" y="78" width="205" height="38" rx="9" fill="#fff" stroke="#c9d2f2" stroke-width="2"/>
+              <text x="842" y="104" fill="#17243b" font-size="20" text-anchor="middle">RIB / LIB</text>
+              <path d="M500 137 V166" stroke="#398e91" stroke-width="4"/>
+              <path d="M488 157 L500 171 L512 157" fill="#398e91"/>
+              <text x="520" y="158" fill="#52647a" font-size="17">programa</text>
+              <rect x="30" y="178" width="940" height="97" rx="15" fill="#effafa"/>
+              <text x="55" y="214" fill="#087c89" font-size="22" font-weight="800">PLANO DE DATOS · REENVÍA CADA PAQUETE</text>
+              <rect x="95" y="228" width="270" height="34" rx="8" fill="#fff" stroke="#bce9e5" stroke-width="2"/>
+              <text x="230" y="252" fill="#17243b" font-size="20" text-anchor="middle">FIB / LFIB · decisión</text>
+              <path d="M382 245 H510" stroke="#398e91" stroke-width="4"/>
+              <path d="M500 233 L516 245 L500 257" fill="none" stroke="#398e91" stroke-width="4"/>
+              <rect x="535" y="228" width="330" height="34" rx="8" fill="#fff" stroke="#bce9e5" stroke-width="2"/>
+              <text x="700" y="252" fill="#17243b" font-size="20" text-anchor="middle">ASIC aplica · push / swap / pop</text>
+            </svg>
+            <figcaption>Control = construye las instrucciones. Datos = las ejecuta paquete por paquete. Puede haber rutas aprendidas sin una entrada correcta en la LFIB.</figcaption>
+          </figure>
           <div class="callout"><span class="callout-mark">!</span><span>Una ruta aprendida no garantiza que ya se reenvíe tráfico. En un fallo, comprueba por separado el protocolo, la ruta seleccionada y la entrada instalada en FIB/LFIB.</span></div>
           <aside class="speaker-cue"><strong>Usa la analogía del GPS y el conductor</strong><p>El plano de control calcula y prepara el mapa; el plano de datos lo consulta para mover cada paquete. Si el mapa está bien pero la instrucción no se instaló, el paquete puede fallar igualmente.</p></aside>
         </section>
@@ -325,6 +374,30 @@
           <p class="slide-kicker">11 · Señalización</p><h2 id="slide-title-11">Distribución de etiquetas con LDP</h2>
           <p class="lead">LDP permite que los routers intercambien etiquetas asociadas a destinos. En el caso habitual, la FEC corresponde a un prefijo aprendido por el IGP y cada router anuncia la etiqueta que sus vecinos usarán para llegar hasta él.</p>
           <div class="three-steps"><div class="step"><b>1 · Descubrir</b><span>Mensajes Hello sobre UDP identifican vecinos LDP en enlaces habilitados.</span></div><div class="step"><b>2 · Establecer sesión</b><span>Los routers abren una sesión TCP, normalmente en el puerto 646.</span></div><div class="step"><b>3 · Anunciar etiquetas</b><span>Label Mapping relaciona una FEC con una etiqueta; cada vecino programa su LFIB.</span></div></div>
+          <figure class="diagram-frame">
+            <svg viewBox="0 0 1000 255" role="img" aria-labelledby="ldp-diagram-title ldp-diagram-desc">
+              <title id="ldp-diagram-title">Intercambio de mensajes entre vecinos LDP</title>
+              <desc id="ldp-diagram-desc">Dos routers se descubren con Hello por UDP, establecen una sesión TCP y después intercambian asociaciones de etiquetas.</desc>
+              <rect x="75" y="82" width="200" height="100" rx="16" fill="#effafa" stroke="#79c9c4" stroke-width="3"/>
+              <text x="175" y="126" fill="#087c89" font-size="25" font-weight="800" text-anchor="middle">LSR A</text>
+              <text x="175" y="156" fill="#52647a" font-size="19" text-anchor="middle">vecino MPLS</text>
+              <rect x="725" y="82" width="200" height="100" rx="16" fill="#effafa" stroke="#79c9c4" stroke-width="3"/>
+              <text x="825" y="126" fill="#087c89" font-size="25" font-weight="800" text-anchor="middle">LSR B</text>
+              <text x="825" y="156" fill="#52647a" font-size="19" text-anchor="middle">vecino MPLS</text>
+              <path d="M290 93 H710" stroke="#398e91" stroke-width="4"/>
+              <path d="M698 81 L714 93 L698 105" fill="none" stroke="#398e91" stroke-width="4"/>
+              <text x="500" y="78" fill="#17243b" font-size="20" font-weight="700" text-anchor="middle">Hello · UDP/646 · descubrimiento</text>
+              <path d="M710 125 H290" stroke="#7888a0" stroke-width="3"/>
+              <path d="M302 113 L286 125 L302 137" fill="none" stroke="#7888a0" stroke-width="3"/>
+              <text x="500" y="120" fill="#52647a" font-size="18" text-anchor="middle">Hello en ambos sentidos</text>
+              <path d="M290 164 H710" stroke="#087c89" stroke-width="4"/>
+              <path d="M698 152 L714 164 L698 176" fill="none" stroke="#087c89" stroke-width="4"/>
+              <text x="500" y="158" fill="#17243b" font-size="19" font-weight="700" text-anchor="middle">Sesión TCP/646 · intercambio confiable</text>
+              <rect x="275" y="205" width="450" height="38" rx="9" fill="#eef2ff"/>
+              <text x="500" y="231" fill="#394c83" font-size="20" font-weight="700" text-anchor="middle">Label Mapping · FEC ↔ etiqueta</text>
+            </svg>
+            <figcaption>LDP no transporta los paquetes de usuario: coordina entre routers las etiquetas que luego usarán las tablas de forwarding.</figcaption>
+          </figure>
           <div class="flow"><div class="flow-node edge"><strong>LSR A</strong><small>usa label 22</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>LSR B</strong><small>usa label 40<br>hacia C</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>LSR C</strong><small>anuncia FEC<br>10.0.0.0/8</small></div></div>
           <div class="callout"><span class="callout-mark">i</span><span><strong>Las etiquetas son locales:</strong> un router anuncia a su vecino qué etiqueta usar para alcanzar una FEC. Los valores pueden ser distintos en cada tramo; lo importante es que cada LFIB coincida con la etiqueta anunciada por el siguiente salto.</span></div>
           <details><summary>¿Qué revisar si no se instala el LSP?</summary><p>Alcance IP del router-id, vecinos y sesión LDP, sincronización con IGP cuando se use, etiqueta anunciada por el siguiente salto y entrada resultante en la LFIB.</p></details>
@@ -333,7 +406,28 @@
         <section class="slide" data-title="RSVP-TE: caminos explícitos con restricciones" aria-labelledby="slide-title-12">
           <p class="slide-kicker">12 · Ingeniería de tráfico</p><h2 id="slide-title-12">RSVP-TE: caminos explícitos con restricciones</h2>
           <p class="lead">RSVP-TE permite establecer un LSP que siga un trayecto compatible con requisitos de red, en vez de limitarse siempre al camino más corto del IGP.</p>
-          <div class="flow"><div class="flow-node edge"><strong>Ingress</strong><small>calcula y señaliza</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>P1</strong><small>restricciones</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>P3</strong><small>ruta elegida</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>Egress</strong><small>recibe LSP</small></div></div>
+          <figure class="diagram-frame">
+            <svg viewBox="0 0 1000 330" role="img" aria-labelledby="te-diagram-title te-diagram-desc">
+              <title id="te-diagram-title">Comparación de camino más corto y camino RSVP-TE viable</title>
+              <desc id="te-diagram-desc">El camino directo está congestionado; RSVP-TE elige una ruta alternativa con ancho de banda disponible.</desc>
+              <text x="45" y="42" fill="#52647a" font-size="19" font-weight="700">MISMO ORIGEN Y DESTINO · DIFERENTE CAMINO SEGÚN LAS RESTRICCIONES</text>
+              <path d="M110 165 L350 125 L650 125 L890 165" fill="none" stroke="#d27676" stroke-width="8" stroke-dasharray="15 10"/>
+              <text x="500" y="78" fill="#9c3e45" font-size="20" font-weight="800" text-anchor="middle">IGP: camino más corto · no hay 1 Gb/s</text>
+              <path d="M110 165 L350 235 L650 235 L890 165" fill="none" stroke="#27a8a5" stroke-width="9"/>
+              <text x="500" y="285" fill="#087c89" font-size="20" font-weight="800" text-anchor="middle">RSVP-TE: camino factible · 1,2 Gb/s disponibles</text>
+              <g fill="#fff" stroke="#41546b" stroke-width="4">
+                <circle cx="110" cy="165" r="34"/><circle cx="350" cy="125" r="31"/><circle cx="650" cy="125" r="31"/>
+                <circle cx="350" cy="235" r="31"/><circle cx="650" cy="235" r="31"/><circle cx="890" cy="165" r="34"/>
+              </g>
+              <g fill="#17243b" font-size="18" font-weight="800" text-anchor="middle">
+                <text x="110" y="171">IN</text><text x="350" y="131">P1</text><text x="650" y="131">P2</text>
+                <text x="350" y="241">P3</text><text x="650" y="241">P5</text><text x="890" y="171">OUT</text>
+              </g>
+              <circle cx="500" cy="125" r="24" fill="#fff2f0" stroke="#d27676" stroke-width="3"/>
+              <path d="M488 113 L512 137 M512 113 L488 137" stroke="#b44d52" stroke-width="5"/>
+            </svg>
+            <figcaption>CSPF descarta enlaces que incumplen restricciones. PATH solicita el camino; RESV confirma el establecimiento si los saltos pueden aceptarlo.</figcaption>
+          </figure>
           <div class="grid grid-3"><article class="card"><h3>CSPF</h3><p>Calcula una ruta que satisface restricciones anunciadas y configuradas, como ancho de banda disponible o afinidades.</p></article><article class="card"><h3>PATH</h3><p>El ingreso señaliza hacia el egreso el camino solicitado y los requisitos de tráfico.</p></article><article class="card"><h3>RESV</h3><p>Si cada salto acepta la solicitud, la respuesta vuelve confirmando el establecimiento y las etiquetas. El ancho de banda es control de admisión, no una garantía mágica de rendimiento.</p></article></div>
           <div class="callout"><span class="callout-mark">↗</span><span>El camino más corto puede rechazarse si no dispone, por ejemplo, del 1 Gb/s solicitado. El diseño debe contemplar prioridades y qué sucede al no encontrar recursos.</span></div>
           <aside class="speaker-cue"><strong>Contrasta el camino automático con el camino condicionado</strong><p>LDP suele acompañar el camino que eligió el IGP. RSVP-TE permite pedir un camino con restricciones. Si no hay ruta que cumpla las condiciones, el túnel puede no establecerse: hay que definir qué hacer entonces.</p></aside>
@@ -343,6 +437,30 @@
           <p class="lead">Una L3VPN permite que varias sedes intercambien rutas privadas a través del proveedor, manteniendo tablas de cliente separadas en los PE.</p>
           <div class="grid grid-3"><article class="card"><div class="card-icon">VRF</div><h3>Tabla por servicio</h3><p>Guarda rutas y decisiones de forwarding de un cliente o dominio independiente.</p></article><article class="card"><div class="card-icon">RD</div><h3>Route Distinguisher</h3><p>Hace única una ruta VPN cuando distintos clientes usan el mismo prefijo IPv4/IPv6.</p></article><article class="card"><div class="card-icon">RT</div><h3>Route Target</h3><p>Atributo BGP que controla qué rutas se exportan e importan en cada VRF.</p></article></div>
           <div class="flow"><div class="flow-node edge"><strong>VRF ACME</strong><small>RD 65000:10</small></div><span class="flow-arrow">↔</span><div class="flow-node"><strong>MP-BGP</strong><small>VPNv4 / VPNv6</small></div><span class="flow-arrow">↔</span><div class="flow-node edge"><strong>VRF ACME</strong><small>import RT 65000:100</small></div></div>
+          <figure class="diagram-frame">
+            <svg viewBox="0 0 1000 315" role="img" aria-labelledby="vpn-diagram-title vpn-diagram-desc">
+              <title id="vpn-diagram-title">Dos VPN de cliente separadas sobre el mismo núcleo MPLS</title>
+              <desc id="vpn-diagram-desc">Las rutas con el mismo prefijo de dos clientes permanecen en VRF distintas y viajan separadas mediante etiquetas y políticas.</desc>
+              <rect x="300" y="24" width="400" height="265" rx="22" fill="#f5f8fb" stroke="#dfe7ed" stroke-width="2"/>
+              <text x="500" y="51" fill="#52647a" font-size="19" font-weight="800" text-anchor="middle">NÚCLEO DEL PROVEEDOR</text>
+              <path d="M110 155 H890" stroke="#27a8a5" stroke-width="7"/>
+              <path d="M110 240 H890" stroke="#8173bd" stroke-width="7"/>
+              <g fill="#fff" stroke="#41546b" stroke-width="3">
+                <circle cx="110" cy="155" r="31"/><circle cx="350" cy="155" r="28"/><circle cx="500" cy="155" r="28"/><circle cx="650" cy="155" r="28"/><circle cx="890" cy="155" r="31"/>
+                <circle cx="110" cy="240" r="31"/><circle cx="350" cy="240" r="28"/><circle cx="500" cy="240" r="28"/><circle cx="650" cy="240" r="28"/><circle cx="890" cy="240" r="31"/>
+              </g>
+              <g fill="#17243b" font-size="17" font-weight="800" text-anchor="middle">
+                <text x="110" y="161">CE</text><text x="350" y="161">PE</text><text x="500" y="161">P</text><text x="650" y="161">PE</text><text x="890" y="161">CE</text>
+                <text x="110" y="246">CE</text><text x="350" y="246">PE</text><text x="500" y="246">P</text><text x="650" y="246">PE</text><text x="890" y="246">CE</text>
+              </g>
+              <text x="350" y="125" fill="#087c89" font-size="16" font-weight="700" text-anchor="middle">VRF AZUL</text>
+              <text x="350" y="210" fill="#65589c" font-size="16" font-weight="700" text-anchor="middle">VRF VIOLETA</text>
+              <rect x="375" y="66" width="250" height="34" rx="8" fill="#e7f8f7"/>
+              <text x="500" y="89" fill="#087c89" font-size="16" font-weight="800" text-anchor="middle">MP-BGP anuncia rutas VPN</text>
+              <text x="500" y="307" fill="#52647a" font-size="17" font-weight="700" text-anchor="middle">Ambos clientes pueden usar 10.0.0.0/8 sin mezclar sus rutas</text>
+            </svg>
+            <figcaption>El proveedor comparte la infraestructura física, pero mantiene separados los contextos de rutas de cada cliente.</figcaption>
+          </figure>
           <div class="callout"><span class="callout-mark">i</span><span><strong>RD no es RT:</strong> RD diferencia rutas; RT define su distribución entre VRF. MP-BGP propaga la ruta VPN y la etiqueta de servicio hasta el PE remoto.</span></div>
           <div class="three-steps"><div class="step"><b>1 · Aprende</b><span>El PE de origen recibe la ruta del cliente en su VRF.</span></div><div class="step"><b>2 · Anuncia</b><span>MP-BGP transporta la ruta VPN, RD, RT y etiqueta de servicio hacia el PE remoto.</span></div><div class="step"><b>3 · Entrega</b><span>El RT permite importar la ruta en la VRF destino; el PE usa la etiqueta para reconocer el servicio.</span></div></div>
           <aside class="speaker-cue"><strong>Narra cómo una ruta de una sede llega a la otra</strong><p>El PE aprende la ruta del cliente, le agrega contexto para identificarla y la anuncia con MP-BGP. El PE remoto comprueba el RT, la importa en la VRF correcta y anuncia una etiqueta de servicio. Así se conectan las sedes sin mezclar sus tablas.</p></aside>
@@ -367,6 +485,31 @@
           <p class="lead">DiffServ clasifica paquetes según el tratamiento esperado. El campo TC (antes llamado EXP) de MPLS puede transportar esa clase por el núcleo; cada equipo debe mapearla a su política local de colas.</p>
           <div class="table-wrap"><table><thead><tr><th>Clase ilustrativa</th><th>Tratamiento esperado</th><th>Ejemplo</th></tr></thead><tbody><tr><td><strong>Tiempo real · EF</strong></td><td>Baja latencia; prioridad limitada para no bloquear otras clases</td><td>Voz</td></tr><tr><td><strong>Crítica · AF4x</strong></td><td>Menor probabilidad de descarte y recursos acordados</td><td>Vídeo / control</td></tr><tr><td><strong>Negocio · AF2x</strong></td><td>Ancho de banda definido por política</td><td>Aplicaciones corporativas</td></tr><tr><td><strong>Best effort · BE</strong></td><td>Cola estándar</td><td>Internet general</td></tr></tbody></table></div>
           <div class="three-steps"><div class="step"><b>Clasificar y marcar</b><span>Identificar aplicación y mapear DSCP/TC.</span></div><div class="step"><b>Controlar el ingreso</b><span>Aplicar policing o shaping al tráfico.</span></div><div class="step"><b>Gestionar congestión</b><span>Configurar colas, scheduling y descarte en cada cuello de botella.</span></div></div>
+          <figure class="diagram-frame">
+            <svg viewBox="0 0 1000 270" role="img" aria-labelledby="qos-diagram-title qos-diagram-desc">
+              <title id="qos-diagram-title">Clases de tráfico, colas y enlace MPLS</title>
+              <desc id="qos-diagram-desc">Voz, aplicaciones y tráfico general se clasifican y esperan en colas con políticas distintas antes de compartir el enlace.</desc>
+              <text x="45" y="40" fill="#52647a" font-size="19" font-weight="700">LAS CLASES COMPARTEN EL ENLACE; LAS COLAS DEFINEN CÓMO SE ATIENDE CADA UNA</text>
+              <g font-size="19" font-weight="800">
+                <rect x="45" y="70" width="190" height="38" rx="9" fill="#fff2e5"/><text x="65" y="96" fill="#885525">VOZ · EF</text>
+                <rect x="45" y="120" width="190" height="38" rx="9" fill="#eef2ff"/><text x="65" y="146" fill="#394c83">APPS · AF</text>
+                <rect x="45" y="170" width="190" height="38" rx="9" fill="#effafa"/><text x="65" y="196" fill="#087c89">RESTO · BE</text>
+              </g>
+              <path d="M245 89 H390 M245 139 H390 M245 189 H390" stroke="#8b9aaa" stroke-width="4"/>
+              <path d="M378 78 L394 89 L378 100 M378 128 L394 139 L378 150 M378 178 L394 189 L378 200" fill="none" stroke="#8b9aaa" stroke-width="3"/>
+              <rect x="410" y="65" width="280" height="155" rx="15" fill="#fff" stroke="#cfdde5" stroke-width="2"/>
+              <text x="550" y="93" fill="#17243b" font-size="20" font-weight="800" text-anchor="middle">COLAS + SCHEDULER</text>
+              <rect x="440" y="108" width="220" height="27" rx="6" fill="#f7e3c4"/><text x="550" y="128" fill="#68451d" font-size="16" font-weight="700" text-anchor="middle">EF · baja latencia, prioridad limitada</text>
+              <rect x="440" y="144" width="220" height="27" rx="6" fill="#e4e9fa"/><text x="550" y="164" fill="#394c83" font-size="16" font-weight="700" text-anchor="middle">AF · recursos y descarte definidos</text>
+              <rect x="440" y="180" width="220" height="27" rx="6" fill="#dff4f2"/><text x="550" y="200" fill="#087c89" font-size="16" font-weight="700" text-anchor="middle">BE · servicio estándar</text>
+              <path d="M700 143 H800" stroke="#398e91" stroke-width="5"/>
+              <path d="M788 130 L804 143 L788 156" fill="none" stroke="#398e91" stroke-width="4"/>
+              <rect x="820" y="100" width="145" height="86" rx="13" fill="#effafa" stroke="#79c9c4" stroke-width="2"/>
+              <text x="892" y="136" fill="#087c89" font-size="20" font-weight="800" text-anchor="middle">ENLACE</text>
+              <text x="892" y="163" fill="#52647a" font-size="17" text-anchor="middle">capacidad finita</text>
+            </svg>
+            <figcaption>TC/DSCP ayuda a clasificar, pero la calidad depende de las colas, el planificador y la capacidad configurada en cada cuello de botella.</figcaption>
+          </figure>
           <div class="callout"><span class="callout-mark">!</span><span>TC no reserva ancho de banda por sí solo. La garantía depende de una política coherente extremo a extremo y del dimensionamiento de cada enlace.</span></div>
           <aside class="speaker-cue"><strong>Separa marcar de garantizar</strong><p>La red puede marcar voz para tratarla con baja latencia, pero la marca no crea capacidad. Hace falta que los routers interpreten esa clase de forma coherente y configuren colas en los enlaces donde pueda haber congestión.</p></aside>
         </section>
@@ -375,6 +518,24 @@
           <p class="lead">La resiliencia combina detección de fallas, un camino alternativo y reconvergencia. Para cumplir un SLA también hay que probar los tiempos y el comportamiento real ante fallos.</p>
           <div class="timeline"><div class="timeline-item"><b>1 · Detectar</b><p>BFD puede identificar rápidamente que un vecino o enlace dejó de responder.</p></div><div class="timeline-item"><b>2 · Conmutar</b><p>FRR usa una alternativa local para reducir el impacto sin esperar al IGP.</p></div><div class="timeline-item"><b>3 · Reconverger</b><p>IGP o TE calcula el camino estable tras el cambio topológico.</p></div><div class="timeline-item"><b>4 · Verificar</b><p>Medir pérdida, latencia, alarmas y recuperación con pruebas programadas.</p></div></div>
           <div class="flow"><div class="flow-node"><strong>Camino primario</strong><small>tráfico normal</small></div><span class="flow-arrow">→</span><div class="flow-node edge"><strong>Falla detectada</strong><small>BFD</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>Backup FRR</strong><small>conmutación local</small></div><span class="flow-arrow">→</span><div class="flow-node"><strong>IGP / TE</strong><small>reconvergencia</small></div></div>
+          <figure class="diagram-frame">
+            <svg viewBox="0 0 1000 295" role="img" aria-labelledby="frr-diagram-title frr-diagram-desc">
+              <title id="frr-diagram-title">Conmutación al camino de respaldo ante una falla</title>
+              <desc id="frr-diagram-desc">El camino principal pasa por P1 y P2. Cuando falla el enlace, FRR desvía el tráfico por P3 y P4.</desc>
+              <text x="50" y="39" fill="#52647a" font-size="19" font-weight="700">ANTES DE LA FALLA: TRÁFICO POR EL CAMINO PRIMARIO</text>
+              <path d="M120 108 H340 H565 H790 H900" fill="none" stroke="#27a8a5" stroke-width="8"/>
+              <g fill="#fff" stroke="#41546b" stroke-width="4"><circle cx="120" cy="108" r="29"/><circle cx="340" cy="108" r="29"/><circle cx="565" cy="108" r="29"/><circle cx="790" cy="108" r="29"/><circle cx="900" cy="108" r="29"/></g>
+              <g fill="#17243b" font-size="17" font-weight="800" text-anchor="middle"><text x="120" y="114">IN</text><text x="340" y="114">P1</text><text x="565" y="114">P2</text><text x="790" y="114">P5</text><text x="900" y="114">OUT</text></g>
+              <circle cx="678" cy="108" r="22" fill="#fff2f0" stroke="#d27676" stroke-width="3"/>
+              <path d="M666 96 L690 120 M690 96 L666 120" stroke="#b44d52" stroke-width="5"/>
+              <text x="678" y="75" fill="#a5444b" font-size="17" font-weight="800" text-anchor="middle">FALLA</text>
+              <text x="50" y="180" fill="#52647a" font-size="19" font-weight="700">DESPUÉS DE DETECTARLA: FRR USA EL RESPALDO PREINSTALADO</text>
+              <path d="M120 230 H340 L455 260 L565 230 L790 230 H900" fill="none" stroke="#8173bd" stroke-width="8" stroke-dasharray="14 9"/>
+              <g fill="#fff" stroke="#65589c" stroke-width="4"><circle cx="120" cy="230" r="29"/><circle cx="340" cy="230" r="29"/><circle cx="455" cy="260" r="27"/><circle cx="565" cy="230" r="29"/><circle cx="790" cy="230" r="29"/><circle cx="900" cy="230" r="29"/></g>
+              <g fill="#39415b" font-size="17" font-weight="800" text-anchor="middle"><text x="120" y="236">IN</text><text x="340" y="236">P1</text><text x="455" y="266">P3</text><text x="565" y="236">P4</text><text x="790" y="236">P5</text><text x="900" y="236">OUT</text></g>
+            </svg>
+            <figcaption>BFD puede detectar la pérdida de conectividad; FRR conmuta localmente si la alternativa fue calculada e instalada. Después la red converge a un camino estable.</figcaption>
+          </figure>
           <details><summary>¿Por qué probar el camino de respaldo?</summary><p>Puede no estar instalado, compartir el mismo riesgo físico que el primario o no tener capacidad suficiente. Una prueba controlada confirma que la protección funciona y mantiene la calidad esperada.</p></details>
           <div class="callout"><span class="callout-mark">i</span><span><strong>No son lo mismo:</strong> BFD detecta rápidamente que una sesión o camino dejó de responder; FRR es la protección que conmuta tráfico a una alternativa preinstalada. La disponibilidad y el tiempo dependen del diseño y del equipo.</span></div>
           <aside class="speaker-cue"><strong>Cuenta una recuperación ante una falla</strong><p>Primero se detecta la falla, luego se usa un camino de respaldo si está preparado y, mientras tanto, la red calcula su ruta estable. BFD puede ayudar a detectar; FRR puede reducir el tiempo de interrupción. Siempre se debe probar el respaldo.</p></aside>
@@ -383,6 +544,35 @@
           <p class="slide-kicker">18 · Riesgo operativo</p><h2 id="slide-title-18">Seguridad en MPLS: aislamiento no es cifrado</h2>
           <p class="lead">Una VPN MPLS separa rutas de clientes mediante políticas y tablas independientes. Eso no cifra el contenido ni reemplaza la seguridad del plano de control y de gestión.</p>
           <div class="grid grid-2"><article class="card"><h3>Etiqueta no confiable</h3><p>Filtrar MPLS desde puertos de cliente y aceptar etiquetas solo en las interfaces previstas.</p></article><article class="card"><h3>DoS al plano de control</h3><p>Usar CoPP, límites de sesiones y autenticación donde sea compatible y esté configurada.</p></article><article class="card"><h3>Error de RT o VRF</h3><p>Aplicar plantillas, revisión de cambios y validación de rutas importadas/exportadas.</p></article><article class="card"><h3>Confidencialidad</h3><p>Si se requiere cifrado del transporte, evaluar IPsec o MACsec según el punto de protección y el modelo de amenaza.</p></article></div>
+          <figure class="diagram-frame">
+            <svg viewBox="0 0 1000 260" role="img" aria-labelledby="security-diagram-title security-diagram-desc">
+              <title id="security-diagram-title">Aislamiento de VPN y cifrado son protecciones diferentes</title>
+              <desc id="security-diagram-desc">Las VRF mantienen rutas de clientes separadas; el cifrado protege la confidencialidad de los datos durante el transporte.</desc>
+              <rect x="28" y="28" width="450" height="205" rx="16" fill="#f5f8fb" stroke="#dfe7ed" stroke-width="2"/>
+              <text x="253" y="59" fill="#17243b" font-size="21" font-weight="800" text-anchor="middle">AISLAMIENTO · VRF / VPN</text>
+              <rect x="65" y="82" width="165" height="49" rx="10" fill="#e7f8f7" stroke="#79c9c4" stroke-width="2"/>
+              <text x="147" y="113" fill="#087c89" font-size="19" font-weight="800" text-anchor="middle">VRF CLIENTE A</text>
+              <rect x="275" y="82" width="165" height="49" rx="10" fill="#eef2ff" stroke="#bfcaf0" stroke-width="2"/>
+              <text x="357" y="113" fill="#394c83" font-size="19" font-weight="800" text-anchor="middle">VRF CLIENTE B</text>
+              <path d="M75 165 H430 M75 190 H430" stroke="#b6c2cd" stroke-width="3"/>
+              <path d="M75 165 H430" stroke="#27a8a5" stroke-width="5"/>
+              <path d="M75 190 H430" stroke="#8173bd" stroke-width="5"/>
+              <text x="253" y="220" fill="#52647a" font-size="17" text-anchor="middle">Rutas separadas · contenido no necesariamente cifrado</text>
+              <path d="M500 130 H555" stroke="#8b9aaa" stroke-width="4"/>
+              <path d="M543 118 L559 130 L543 142" fill="none" stroke="#8b9aaa" stroke-width="4"/>
+              <rect x="580" y="28" width="392" height="205" rx="16" fill="#effafa" stroke="#bce9e5" stroke-width="2"/>
+              <text x="776" y="59" fill="#087c89" font-size="21" font-weight="800" text-anchor="middle">CONFIDENCIALIDAD · IPsec / MACsec</text>
+              <rect x="615" y="94" width="105" height="55" rx="10" fill="#fff" stroke="#cfdde5" stroke-width="2"/>
+              <text x="667" y="128" fill="#17243b" font-size="18" font-weight="700" text-anchor="middle">DATOS</text>
+              <path d="M730 121 H810" stroke="#398e91" stroke-width="5"/>
+              <path d="M798 109 L814 121 L798 133" fill="none" stroke="#398e91" stroke-width="4"/>
+              <rect x="830" y="94" width="105" height="55" rx="10" fill="#fff" stroke="#79c9c4" stroke-width="2"/>
+              <text x="882" y="128" fill="#087c89" font-size="18" font-weight="800" text-anchor="middle">CIFRADOS</text>
+              <text x="776" y="187" fill="#40546b" font-size="17" text-anchor="middle">Aporta privacidad criptográfica; no reemplaza</text>
+              <text x="776" y="210" fill="#40546b" font-size="17" text-anchor="middle">el control de acceso ni la segmentación.</text>
+            </svg>
+            <figcaption>La VPN mantiene rutas aisladas. Si también se necesita confidencialidad frente a quien pueda observar el transporte, se requiere cifrado adecuado al punto de protección.</figcaption>
+          </figure>
           <div class="callout"><span class="callout-mark">!</span><span><strong>Principio:</strong> proteger los planos de control, datos y gestión; auditar el aprovisionamiento de extremo a extremo. Aislamiento no equivale a privacidad criptográfica.</span></div>
           <aside class="speaker-cue"><strong>Evita decir que MPLS “cifra”</strong><p>Una VPN MPLS separa las rutas de sus clientes, pero eso no cifra automáticamente los paquetes. Si el requisito es que terceros no puedan leer los datos, hay que añadir un mecanismo de cifrado y proteger también la administración de la red.</p></aside>
         </section>
