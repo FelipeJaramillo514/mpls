@@ -46,6 +46,9 @@
     .main { min-height: 100vh; margin-left: 0; }
     .topbar { position: sticky; top: 0; z-index: 3; display: flex; min-height: 68px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 clamp(20px, 4vw, 58px); border-bottom: 1px solid #ffffff16; background: #0b1424eF; backdrop-filter: blur(14px); }
     .topbar-left, .topbar-right { display: flex; align-items: center; gap: 13px; }
+    .pdf-button { display: inline-flex; min-height: 38px; align-items: center; gap: 8px; padding: 0 12px; border: 1px solid #3673ed; border-radius: 9px; color: #fff; background: #2563eb; font-size: 14px; font-weight: 750; cursor: pointer; }
+    .pdf-button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .pdf-button:hover { background: #1d55bd; }
     .menu-toggle { display: inline-grid; width: 38px; height: 38px; flex: none; place-items: center; border: 1px solid #31445b; border-radius: 9px; color: #c8d8e8; background: #132239; cursor: pointer; }
     .eyebrow { color: var(--muted); font-size: 16px; font-weight: 750; }
     .counter { color: var(--muted); font-size: 17px; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -403,6 +406,27 @@
     @media (prefers-reduced-motion: reduce) {
       .osi-stack .stack-row, .bits .bit, .concept-flow .flow-node, .table-wrap tbody tr { animation: none !important; }
     }
+    @media print {
+      @page { size: 13.333in 7.5in landscape; margin: 0; }
+      html, body { width: 13.333in; min-width: 0 !important; height: auto; margin: 0 !important; overflow: visible !important; background: #fff !important; }
+      .sidebar, .topbar, .slide-controls, .speaker-guide, .mobile-scrim, .route-controls, .operation-controls, .operation-sequence-controls, .choice-row { display: none !important; }
+      .main { min-height: 0; margin: 0 !important; }
+      .stage { min-height: 0; padding: 0 !important; }
+      .slide { display: block !important; width: 13.333in; height: 7.5in; padding: .45in .62in .35in; overflow: hidden; break-after: page; page-break-after: always; animation: none !important; background: #fff; }
+      .slide:last-of-type { break-after: auto; page-break-after: auto; }
+      .slide h1 { font-size: 48px; }
+      .slide h2 { font-size: 38px; }
+      .lead { font-size: 18px; margin-bottom: 18px; }
+      .speaker-cue { display: none !important; }
+      details > *:not(summary) { display: block !important; }
+      .cover { min-height: 6.35in; height: 6.35in; }
+      .card { break-inside: avoid; }
+      .flow-node, .table-wrap, .route-figure, .operation-demo, .comparison-visual, .diagram-frame { break-inside: avoid; }
+      .card p, .callout, .quote, .compare-row, .stack-row, .step span { font-size: 15px; }
+      .card h3 { font-size: 18px; }
+      .diagram-frame svg { max-height: 3.8in; }
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -417,7 +441,13 @@
     <main class="main">
       <header class="topbar">
         <div class="topbar-left"><button class="menu-toggle icon-button" id="menu-toggle" type="button" aria-label="Abrir índice" aria-expanded="false" title="Abrir índice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><span class="eyebrow" id="section-name">MPLS</span></div>
-        <div class="topbar-right"><div class="progress-track" role="progressbar" aria-label="Progreso de la presentación" aria-valuemin="1" aria-valuemax="20" aria-valuenow="1"><div class="progress-value" id="progress-value"></div></div><span class="counter"><strong id="current-number">01</strong> / <span id="total-number">20</span></span></div>
+        <div class="topbar-right">
+          <button class="pdf-button" id="pdf-download" type="button" aria-label="Descargar presentación en PDF" title="Descargar presentación en PDF">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M5 21h14"/></svg>
+            <span>Descargar PDF</span>
+          </button>
+          <div class="progress-track" role="progressbar" aria-label="Progreso de la presentación" aria-valuemin="1" aria-valuemax="20" aria-valuenow="1"><div class="progress-value" id="progress-value"></div></div><span class="counter"><strong id="current-number">01</strong> / <span id="total-number">20</span></span>
+        </div>
       </header>
       <div class="stage">
         <section class="slide is-active" data-title="MPLS: Arquitectura, Operación y Aplicaciones" aria-labelledby="slide-title-1">
@@ -978,6 +1008,7 @@
       const guideExplanation = document.getElementById("guide-explanation");
       const presentationToggle = document.getElementById("presentation-toggle");
       const presentationStatus = document.getElementById("presentation-status");
+      const pdfDownload = document.getElementById("pdf-download");
       const app = document.querySelector(".app");
       const sidebar = document.getElementById("sidebar");
       const menuToggle = document.getElementById("menu-toggle");
@@ -1537,6 +1568,10 @@
           ? document.exitFullscreen()
           : document.documentElement.requestFullscreen();
         void action.catch(reportPresentationError);
+      });
+      pdfDownload.addEventListener("click", () => {
+        document.querySelectorAll("details").forEach(detail => detail.setAttribute("open", ""));
+        window.print();
       });
       document.addEventListener("keydown", event => {
         if (event.altKey || event.ctrlKey || event.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
