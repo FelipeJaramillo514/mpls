@@ -6,6 +6,8 @@
   <meta name="theme-color" content="#f4f7fb">
   <meta name="description" content="Presentación guiada sobre arquitectura, operación y aplicaciones de MPLS.">
   <title>MPLS: Arquitectura, Operación y Aplicaciones</title>
+  <script src="./html2canvas.min.js"></script>
+  <script src="./jspdf.umd.min.js"></script>
   <style>
     :root {
       color-scheme: light;
@@ -406,6 +408,35 @@
     @media (prefers-reduced-motion: reduce) {
       .osi-stack .stack-row, .bits .bit, .concept-flow .flow-node, .table-wrap tbody tr { animation: none !important; }
     }
+    .pdf-export-slide {
+      position: fixed !important;
+      inset: 0 auto auto 0 !important;
+      z-index: 10000;
+      display: block !important;
+      width: 1280px;
+      min-height: 720px;
+      height: auto;
+      margin: 0;
+      padding: 34px 52px;
+      overflow: visible;
+      color: var(--ink);
+      background: #fff;
+      box-shadow: none;
+      animation: none !important;
+    }
+    .pdf-export-slide details { margin-bottom: 8px; }
+    .pdf-export-slide details > *:not(summary) { display: block !important; }
+    .pdf-export-slide .lead { margin-bottom: 18px; font-size: 18px; }
+    .pdf-export-slide h1 { font-size: 48px; }
+    .pdf-export-slide h2 { margin-bottom: 14px; font-size: 38px; }
+    .pdf-export-slide .card { padding: 14px; }
+    .pdf-export-slide .card h3 { font-size: 18px; }
+    .pdf-export-slide .card p,
+    .pdf-export-slide .callout,
+    .pdf-export-slide .quote,
+    .pdf-export-slide .compare-row,
+    .pdf-export-slide .stack-row,
+    .pdf-export-slide .step span { font-size: 14px; }
     @media print {
       @page { size: 13.333in 7.5in landscape; margin: 0; }
       html, body { width: 13.333in; min-width: 0 !important; height: auto; margin: 0 !important; overflow: visible !important; background: #fff !important; }
@@ -1569,9 +1600,71 @@
           : document.documentElement.requestFullscreen();
         void action.catch(reportPresentationError);
       });
+      async function downloadPresentationPdf() {
+        if (!window.html2canvas || !window.jspdf?.jsPDF) {
+          window.alert("No se pudo cargar el generador de PDF. Revisa tu conexión e inténtalo nuevamente.");
+          return;
+        }
+        const originalLabel = pdfDownload.querySelector("span").textContent;
+        pdfDownload.disabled = true;
+        pdfDownload.querySelector("span").textContent = "Generando 0/20...";
+        let pdf = null;
+        try {
+          const { jsPDF } = window.jspdf;
+          pdf = new jsPDF({
+            orientation: "landscape",
+            unit: "px",
+            format: [1280, 720],
+            hotfixes: ["px_scaling"]
+          });
+          for (let index = 0; index < slides.length; index += 1) {
+            pdfDownload.querySelector("span").textContent = `Generando ${index + 1}/${slides.length}...`;
+            const clone = slides[index].cloneNode(true);
+            clone.className = "slide pdf-export-slide";
+            clone.removeAttribute("aria-current");
+            clone.querySelectorAll("details").forEach(detail => detail.setAttribute("open", ""));
+            clone.querySelectorAll(".speaker-cue").forEach(cue => cue.remove());
+            document.body.append(clone);
+            const canvas = await window.html2canvas(clone, {
+              scale: 2,
+              width: 1280,
+              windowWidth: 1280,
+              height: Math.max(720, clone.scrollHeight),
+              windowHeight: Math.max(720, clone.scrollHeight),
+              backgroundColor: "#ffffff",
+              useCORS: true,
+              logging: false
+            });
+            clone.remove();
+            if (index > 0) pdf.addPage([1280, 720], "landscape");
+            const image = canvas.toDataURL("image/jpeg", 0.92);
+            const pageWidth = 1280;
+            const pageHeight = 720;
+            const ratio = canvas.width / canvas.height;
+            let width = pageWidth;
+            let height = width / ratio;
+            let x = 0;
+            let y = (pageHeight - height) / 2;
+            if (height > pageHeight) {
+              height = pageHeight;
+              width = height * ratio;
+              x = (pageWidth - width) / 2;
+              y = 0;
+            }
+            pdf.addImage(image, "JPEG", x, y, width, height, undefined, "FAST");
+          }
+          pdf.save("MPLS-arquitectura-operacion-aplicaciones.pdf");
+        } catch (error) {
+          console.error("No se pudo generar el PDF.", error);
+          window.alert("No se pudo generar el PDF completo. Inténtalo nuevamente.");
+        } finally {
+          document.querySelectorAll(".pdf-export-slide").forEach(clone => clone.remove());
+          pdfDownload.disabled = false;
+          pdfDownload.querySelector("span").textContent = originalLabel;
+        }
+      }
       pdfDownload.addEventListener("click", () => {
-        document.querySelectorAll("details").forEach(detail => detail.setAttribute("open", ""));
-        window.print();
+        void downloadPresentationPdf();
       });
       document.addEventListener("keydown", event => {
         if (event.altKey || event.ctrlKey || event.metaKey || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) return;
